@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.wear.widget.BoxInsetLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/box_inset_layout_padding"
+    tools:context=".MainActivity"
+    tools:deviceIds="wear">
+
+  <FrameLayout
+      android:id="@+id/main_text_layout"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:padding="@dimen/inner_frame_layout_padding"
+      app:layout_boxedEdges="all"
+      android:clickable="false">
+
+    <TextView
+        android:id="@+id/txt_input"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:textSize="20sp"
+        android:textColor="#FFFFFF"/>
+    <TextView
+        android:id="@+id/txt_result"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:textSize="20sp"/>
+
+  </FrameLayout>
+
+  <RelativeLayout
+      android:id="@+id/digits_layout"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent" />
+
+  <RelativeLayout
+      android:id="@+id/center_menu_layout"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:alpha="0"
+      android:clickable="false">
+
+      <RelativeLayout
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_centerInParent="true">
+        <TextView
+            android:id="@+id/txt_add"
+            android:alpha="0.7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="+"
+            android:textSize="28sp"
+            android:layout_marginTop="120dp"
+            android:layout_centerHorizontal="true"
+            android:fontFamily="sans-serif-medium"
+            android:textColor="#FFFFFF"/>
+        <TextView
+            android:id="@+id/txt_subtract"
+            android:alpha="0.7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="-"
+            android:textSize="28sp"
+            android:layout_marginBottom="120dp"
+            android:layout_centerHorizontal="true"
+            android:fontFamily="sans-serif-medium"
+            android:textColor="#FFFFFF"/>
+        <TextView
+            android:id="@+id/txt_multiply"
+            android:alpha="0.7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="×"
+            android:textSize="28sp"
+            android:layout_marginLeft="120dp"
+            android:layout_centerVertical="true"
+            android:fontFamily="sans-serif-medium"
+            android:textColor="#FFFFFF"/>
+        <TextView
+            android:id="@+id/txt_divide"
+            android:alpha="0.7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="÷"
+            android:textSize="28sp"
+            android:layout_marginRight="120dp"
+            android:layout_centerVertical="true"
+            android:fontFamily="sans-serif-medium"
+            android:textColor="#FFFFFF"/>
+        <TextView
+            android:id="@+id/txt_equal"
+            android:alpha="0.7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="="
+            android:textSize="28sp"
+            android:layout_centerInParent="true"
+            android:fontFamily="sans-serif-medium"
+            android:textColor="#FFFFFF"/>
+
+        <ImageView
+            android:id="@+id/img_backspace"
+            android:alpha="0.7"
+            android:src="@drawable/ic_baseline_backspace_24"
+            android:layout_width="16dp"
+            android:layout_height="16dp"
+            android:layout_alignTop="@id/txt_subtract"
+            android:layout_alignLeft="@id/txt_divide"
+            android:layout_marginTop="32dp"
+            android:layout_marginLeft="18dp"/>
+
+        <TextView
+            android:id="@+id/txt_dot"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@id/txt_add"
+            android:layout_alignRight="@id/txt_multiply"
+            android:layout_marginRight="22dp"
+            android:layout_marginBottom="22dp"
+            android:alpha="0.7"
+            android:fontFamily="sans-serif-medium"
+            android:text="."
+            android:textColor="#FFFFFF"
+            android:textSize="28sp" />
+
+        <TextView
+            android:id="@+id/txt_pow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@id/txt_subtract"
+            android:layout_alignRight="@id/txt_multiply"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="26dp"
+            android:alpha="0.7"
+            android:fontFamily="sans-serif-medium"
+            android:text="^"
+            android:textColor="#FFFFFF"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/txt_percent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@id/txt_add"
+            android:layout_alignLeft="@id/txt_divide"
+            android:layout_marginLeft="18dp"
+            android:layout_marginBottom="18dp"
+            android:alpha="0.7"
+            android:fontFamily="sans-serif-medium"
+            android:text="%"
+            android:textColor="#FFFFFF"
+            android:textSize="24sp" />
+
+        </RelativeLayout>
+
+  </RelativeLayout>
+
+</androidx.wear.widget.BoxInsetLayout>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <attr name="MaterialTextButton" format="reference"/>
+  <color name="brand_orange">#DC8F3D</color>
+  <style name="Theme.MyApp" parent="Theme.Material3.Dark.NoActionBar">
+    <item name="android:windowSwipeToDismiss">false</item>
+    <item name="android:backgroundTint">#000000</item>
+    <item name="colorPrimary">@color/brand_orange</item>
+    <item name="MaterialTextButton">@style/Widget.MaterialComponents.Button.TextButton</item>
+  </style>
+</resources>
