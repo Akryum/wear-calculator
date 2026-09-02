@@ -2,4 +2,16 @@
 <resources>
   <string name="app_name">Calculatrice pour Montre</string>
   <string name="launcher_name">Calculatrice</string>
+  <string name="tutorial_progress">Tutoriel %1$d sur %2$d</string>
+  <string name="tutorial_tap_number_title">Touchez les chiffres</string>
+  <string name="tutorial_tap_number_body">Touchez un chiffre sur le bord.</string>
+  <string name="tutorial_drag_action_title">Choisissez une action</string>
+  <string name="tutorial_drag_action_body">Appuyez au centre, faites glisser vers une action, puis relâchez.</string>
+  <string name="tutorial_clear_input_title">Effacer la saisie</string>
+  <string name="tutorial_clear_input_body">Faites glisser vers retour, puis maintenez pour tout effacer.</string>
+  <string name="tutorial_skip">Passer</string>
+  <string name="tutorial_done">Terminé</string>
+  <string name="tutorial_skip_description">Passer le tutoriel</string>
+  <string name="tutorial_done_description">Terminer le tutoriel</string>
+  <string name="tutorial_next_description">Touchez pour continuer le tutoriel</string>
 </resources>

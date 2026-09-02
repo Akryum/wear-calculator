@@ -2,4 +2,16 @@
 <resources>
   <string name="app_name">時計用電卓</string>
   <string name="launcher_name">電卓</string>
+  <string name="tutorial_progress">チュートリアル %1$d / %2$d</string>
+  <string name="tutorial_tap_number_title">数字をタップ</string>
+  <string name="tutorial_tap_number_body">外側にある数字をタップします。</string>
+  <string name="tutorial_drag_action_title">操作を選ぶ</string>
+  <string name="tutorial_drag_action_body">中央を押し、操作までドラッグして離します。</string>
+  <string name="tutorial_clear_input_title">入力を消去</string>
+  <string name="tutorial_clear_input_body">戻るまでドラッグし、長押しですべて消去します。</string>
+  <string name="tutorial_skip">スキップ</string>
+  <string name="tutorial_done">完了</string>
+  <string name="tutorial_skip_description">チュートリアルをスキップ</string>
+  <string name="tutorial_done_description">チュートリアルを終了</string>
+  <string name="tutorial_next_description">タップしてチュートリアルを続ける</string>
 </resources>

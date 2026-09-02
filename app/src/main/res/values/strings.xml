@@ -1,6 +1,18 @@
 <resources>
     <string name="app_name">Calculator for Wear</string>
     <string name="launcher_name">Calculator</string>
+    <string name="tutorial_progress">Tutorial %1$d of %2$d</string>
+    <string name="tutorial_tap_number_title">Tap numbers</string>
+    <string name="tutorial_tap_number_body">Tap any number around the edge.</string>
+    <string name="tutorial_drag_action_title">Choose an action</string>
+    <string name="tutorial_drag_action_body">Press the center, drag to an action, then release.</string>
+    <string name="tutorial_clear_input_title">Clear input</string>
+    <string name="tutorial_clear_input_body">Drag to backspace, then hold to clear all.</string>
+    <string name="tutorial_skip">Skip</string>
+    <string name="tutorial_done">Done</string>
+    <string name="tutorial_skip_description">Skip tutorial</string>
+    <string name="tutorial_done_description">Finish tutorial</string>
+    <string name="tutorial_next_description">Tap to continue tutorial</string>
 
     <!--
     This string is used for square devices and overridden by hello_world in

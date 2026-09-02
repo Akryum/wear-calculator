@@ -2,4 +2,16 @@
 <resources>
   <string name="app_name">Calculadora para Reloj</string>
   <string name="launcher_name">Calculadora</string>
+  <string name="tutorial_progress">Tutorial %1$d de %2$d</string>
+  <string name="tutorial_tap_number_title">Toca números</string>
+  <string name="tutorial_tap_number_body">Toca cualquier número del borde.</string>
+  <string name="tutorial_drag_action_title">Elige una acción</string>
+  <string name="tutorial_drag_action_body">Pulsa el centro, arrastra a una acción y suelta.</string>
+  <string name="tutorial_clear_input_title">Borrar entrada</string>
+  <string name="tutorial_clear_input_body">Arrastra a borrar y mantén pulsado para borrar todo.</string>
+  <string name="tutorial_skip">Omitir</string>
+  <string name="tutorial_done">Listo</string>
+  <string name="tutorial_skip_description">Omitir tutorial</string>
+  <string name="tutorial_done_description">Terminar tutorial</string>
+  <string name="tutorial_next_description">Toca para continuar el tutorial</string>
 </resources>

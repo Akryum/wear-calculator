@@ -23,6 +23,7 @@ import kotlin.math.*
 
 class MainActivity : AppCompatActivity() {
   private lateinit var binding: ActivityMainBinding
+  private lateinit var tutorialController: TutorialController
 
   private var activity = this
 
@@ -130,6 +131,19 @@ class MainActivity : AppCompatActivity() {
 
     // Animation
     shortAnimationDuration = resources.getInteger(android.R.integer.config_shortAnimTime)
+
+    tutorialController = TutorialController(this, binding.tutorialContainer)
+    tutorialController.showIfNeeded()
+  }
+
+  override fun onStart() {
+    super.onStart()
+    tutorialController.onStart()
+  }
+
+  override fun onStop() {
+    tutorialController.onStop()
+    super.onStop()
   }
 
   @SuppressLint("SetTextI18n")

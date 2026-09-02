@@ -2,4 +2,16 @@
 <resources>
   <string name="app_name">Rechner für Uhr</string>
   <string name="launcher_name">Rechner</string>
+  <string name="tutorial_progress">Anleitung %1$d von %2$d</string>
+  <string name="tutorial_tap_number_title">Zahlen antippen</string>
+  <string name="tutorial_tap_number_body">Tippe am Rand auf eine Zahl.</string>
+  <string name="tutorial_drag_action_title">Aktion wählen</string>
+  <string name="tutorial_drag_action_body">Mitte drücken, zu einer Aktion ziehen und loslassen.</string>
+  <string name="tutorial_clear_input_title">Eingabe löschen</string>
+  <string name="tutorial_clear_input_body">Zur Löschtaste ziehen und halten, um alles zu löschen.</string>
+  <string name="tutorial_skip">Überspringen</string>
+  <string name="tutorial_done">Fertig</string>
+  <string name="tutorial_skip_description">Anleitung überspringen</string>
+  <string name="tutorial_done_description">Anleitung beenden</string>
+  <string name="tutorial_next_description">Tippen, um mit der Anleitung fortzufahren</string>
 </resources>
