@@ -1,18 +1,17 @@
 plugins {
     id 'com.android.application'
-    id 'org.jetbrains.kotlin.android'
 }
 
 android {
-    namespace 'dev.starpad.calculatorforwear'
-    compileSdk 33
+    namespace = 'dev.starpad.calculatorforwear'
+    compileSdk = 37
 
     defaultConfig {
-        applicationId "dev.starpad.calculatorforwear"
-        minSdk 30
-        targetSdk 33
-        versionCode 3
-        versionName "1.0"
+        applicationId = 'dev.starpad.calculatorforwear'
+        minSdk = 30
+        targetSdk = 37
+        versionCode = 3
+        versionName = '1.0'
 
     }
 
@@ -23,17 +22,16 @@ android {
         }
     }
     buildFeatures {
-        viewBinding true
+        viewBinding = true
     }
 }
 
 dependencies {
-    implementation 'androidx.core:core-ktx:1.9.0'
-    implementation 'com.google.android.gms:play-services-wearable:18.0.0'
-    implementation 'androidx.percentlayout:percentlayout:1.0.0'
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.recyclerview:recyclerview:1.2.1'
-    implementation 'androidx.wear:wear:1.2.0'
-    implementation 'com.google.android.material:material:1.6.1'
+    implementation 'androidx.appcompat:appcompat:1.8.0'
+    implementation 'androidx.core:core-ktx:1.19.0'
+    implementation 'androidx.recyclerview:recyclerview:1.4.0'
+    implementation 'androidx.wear:wear:1.4.0'
+    implementation 'com.google.android.gms:play-services-wearable:20.0.1'
+    implementation 'com.google.android.material:material:1.14.0'
     implementation 'net.objecthunter:exp4j:0.4.8'
 }

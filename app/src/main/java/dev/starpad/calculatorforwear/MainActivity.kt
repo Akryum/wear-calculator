@@ -129,7 +129,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     // Animation
-    shortAnimationDuration = resources.getInteger(com.google.android.material.R.integer.abc_config_activityShortDur)
+    shortAnimationDuration = resources.getInteger(android.R.integer.config_shortAnimTime)
   }
 
   @SuppressLint("SetTextI18n")
