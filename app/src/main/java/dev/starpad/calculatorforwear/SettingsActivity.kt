@@ -1,38 +1,40 @@
 package dev.starpad.calculatorforwear
 
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import dev.starpad.calculatorforwear.databinding.ActivitySettingsBinding
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import dev.starpad.calculatorforwear.settings.SettingsScreen
+import dev.starpad.calculatorforwear.settings.SettingsTheme
 
 /** Lets users control calculator preferences without leaving the app. */
-class SettingsActivity : AppCompatActivity() {
-  private lateinit var binding: ActivitySettingsBinding
-  private lateinit var settingsStore: CalculatorSettingsStore
-  private lateinit var historyStore: CalculationHistoryStore
-
+class SettingsActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    binding = ActivitySettingsBinding.inflate(layoutInflater)
-    setContentView(binding.root)
 
-    settingsStore = CalculatorSettingsStore(this)
-    historyStore = CalculationHistoryStore(this)
-    binding.hapticsSwitch.isChecked = settingsStore.hapticsEnabled()
-    binding.hapticsSwitch.setOnCheckedChangeListener { _, enabled -> settingsStore.setHapticsEnabled(enabled) }
-    binding.showTutorialButton.setOnClickListener {
-      finish()
-      TutorialReplay.request(this)
+    val settingsStore = CalculatorSettingsStore(this)
+    val historyStore = CalculationHistoryStore(this)
+
+    setContent {
+      var hapticsEnabled by rememberSaveable { mutableStateOf(settingsStore.hapticsEnabled()) }
+
+      SettingsTheme {
+        SettingsScreen(
+          hapticsEnabled = hapticsEnabled,
+          onHapticsEnabledChange = { enabled ->
+            hapticsEnabled = enabled
+            settingsStore.setHapticsEnabled(enabled)
+          },
+          onShowTutorial = {
+            finish()
+            TutorialReplay.request(this)
+          },
+          onClearHistory = historyStore::clear,
+        )
+      }
     }
-    binding.clearHistoryButton.setOnClickListener { confirmClearHistory() }
-  }
-
-  private fun confirmClearHistory() {
-    MaterialAlertDialogBuilder(this)
-      .setTitle(R.string.clear_history_title)
-      .setMessage(R.string.clear_history_message)
-      .setNegativeButton(android.R.string.cancel, null)
-      .setPositiveButton(R.string.clear_history_confirm) { _, _ -> historyStore.clear() }
-      .show()
   }
 }

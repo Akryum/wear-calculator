@@ -8,4 +8,9 @@
     <item name="colorPrimary">@color/brand_orange</item>
     <item name="MaterialTextButton">@style/Widget.MaterialComponents.Button.TextButton</item>
   </style>
+  <!-- Settings runs on Wear Compose, so it only needs the platform window behavior the calculator uses. -->
+  <style name="Theme.WearSettings" parent="@android:style/Theme.DeviceDefault">
+    <item name="android:windowSwipeToDismiss">false</item>
+    <item name="android:windowBackground">@android:color/black</item>
+  </style>
 </resources>

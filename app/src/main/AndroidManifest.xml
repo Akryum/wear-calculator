@@ -20,7 +20,8 @@
         <activity
             android:name=".SettingsActivity"
             android:exported="false"
-            android:label="@string/settings_title" />
+            android:label="@string/settings_title"
+            android:theme="@style/Theme.WearSettings" />
 
         <activity
             android:name=".MainActivity"
