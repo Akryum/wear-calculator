@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Static Material 3 dark color roles, used when the device cannot supply Material You colors.
+  Generated as an HCT tonal palette seeded by @color/brand_orange, so the app keeps its branding
+  on those devices. The calculator is dark-only, so there is no light variant.
+-->
+<resources>
+  <!-- App brand color. Seeds the fallback palette and stays fixed in the tutorial overlay. -->
+  <color name="brand_orange">#DC8F3D</color>
+
+  <color name="md_theme_primary">#FFB870</color>
+  <color name="md_theme_on_primary">#4B2800</color>
+  <color name="md_theme_primary_container">#6B3B00</color>
+  <color name="md_theme_on_primary_container">#FFDCBC</color>
+  <color name="md_theme_inverse_primary">#8C4F00</color>
+  <color name="md_theme_secondary">#E2C1A5</color>
+  <color name="md_theme_on_secondary">#402C18</color>
+  <color name="md_theme_secondary_container">#59422D</color>
+  <color name="md_theme_on_secondary_container">#FFDCBE</color>
+  <color name="md_theme_tertiary">#C1CC99</color>
+  <color name="md_theme_on_tertiary">#2B340F</color>
+  <color name="md_theme_tertiary_container">#414B24</color>
+  <color name="md_theme_on_tertiary_container">#DDE8B4</color>
+  <color name="md_theme_error">#FFB4A9</color>
+  <color name="md_theme_on_error">#680003</color>
+  <color name="md_theme_error_container">#930006</color>
+  <color name="md_theme_on_error_container">#FFDAD4</color>
+  <!-- Pure black instead of the neutral tone 10 the ramp would give, to match the tutorial and
+       settings screens and to keep the watch OLED pixels off. -->
+  <color name="md_theme_background">#000000</color>
+  <color name="md_theme_on_background">#EBE0D9</color>
+  <color name="md_theme_surface">#000000</color>
+  <color name="md_theme_on_surface">#EBE0D9</color>
+  <color name="md_theme_surface_variant">#51453A</color>
+  <color name="md_theme_on_surface_variant">#D5C3B6</color>
+  <color name="md_theme_surface_dim">#17120E</color>
+  <color name="md_theme_surface_bright">#3E3833</color>
+  <color name="md_theme_surface_container_lowest">#120E0A</color>
+  <color name="md_theme_surface_container_low">#201B16</color>
+  <color name="md_theme_surface_container">#241F1A</color>
+  <color name="md_theme_surface_container_high">#2F2924</color>
+  <color name="md_theme_surface_container_highest">#3A342F</color>
+  <color name="md_theme_inverse_surface">#EBE0D9</color>
+  <color name="md_theme_inverse_on_surface">#352F2A</color>
+  <color name="md_theme_outline">#9E8E81</color>
+  <color name="md_theme_outline_variant">#51453A</color>
+</resources>

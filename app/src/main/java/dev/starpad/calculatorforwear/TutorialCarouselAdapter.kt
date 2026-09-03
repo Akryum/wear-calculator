@@ -56,7 +56,7 @@ internal class TutorialPageView(
     maxLines = 2
     setPadding(0, dp(3), 0, dp(7))
   }
-  private val action = MaterialButton(context, null, R.attr.MaterialTextButton).apply {
+  private val action = MaterialButton(context, null, R.attr.TutorialTextButton).apply {
     id = R.id.tutorial_action_button
     minHeight = dp(42)
     minWidth = dp(82)

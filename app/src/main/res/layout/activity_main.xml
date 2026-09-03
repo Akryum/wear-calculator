@@ -36,14 +36,14 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:gravity="center"
-              android:textColor="#FFFFFF"
+              android:textColor="?attr/colorOnSurface"
               android:textSize="20sp" />
           <TextView
               android:id="@+id/txt_result"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:gravity="center"
-              android:textColor="#FFFFFF"
+              android:textColor="?attr/colorOnSurface"
               android:textSize="20sp" />
         </FrameLayout>
 
@@ -73,7 +73,7 @@
                 android:alpha="0.7"
                 android:fontFamily="sans-serif-medium"
                 android:text="+"
-                android:textColor="#FFFFFF"
+                android:textColor="?attr/colorOnSurface"
                 android:textSize="28sp" />
             <TextView
                 android:id="@+id/txt_subtract"
@@ -84,7 +84,7 @@
                 android:alpha="0.7"
                 android:fontFamily="sans-serif-medium"
                 android:text="-"
-                android:textColor="#FFFFFF"
+                android:textColor="?attr/colorOnSurface"
                 android:textSize="28sp" />
             <TextView
                 android:id="@+id/txt_multiply"
@@ -95,7 +95,7 @@
                 android:alpha="0.7"
                 android:fontFamily="sans-serif-medium"
                 android:text="×"
-                android:textColor="#FFFFFF"
+                android:textColor="?attr/colorOnSurface"
                 android:textSize="28sp" />
             <TextView
                 android:id="@+id/txt_divide"
@@ -106,7 +106,7 @@
                 android:alpha="0.7"
                 android:fontFamily="sans-serif-medium"
                 android:text="÷"
-                android:textColor="#FFFFFF"
+                android:textColor="?attr/colorOnSurface"
                 android:textSize="28sp" />
             <TextView
                 android:id="@+id/txt_equal"
@@ -116,7 +116,7 @@
                 android:alpha="0.7"
                 android:fontFamily="sans-serif-medium"
                 android:text="="
-                android:textColor="#FFFFFF"
+                android:textColor="?attr/colorOnSurface"
                 android:textSize="28sp" />
             <ImageView
                 android:id="@+id/img_backspace"
@@ -127,7 +127,8 @@
                 android:layout_marginLeft="18dp"
                 android:layout_marginTop="32dp"
                 android:alpha="0.7"
-                android:src="@drawable/ic_baseline_backspace_24" />
+                android:src="@drawable/ic_baseline_backspace_24"
+                app:tint="?attr/colorOnSurface" />
             <TextView
                 android:id="@+id/txt_dot"
                 android:layout_width="wrap_content"
@@ -139,7 +140,7 @@
                 android:alpha="0.7"
                 android:fontFamily="sans-serif-medium"
                 android:text="."
-                android:textColor="#FFFFFF"
+                android:textColor="?attr/colorOnSurface"
                 android:textSize="28sp" />
             <TextView
                 android:id="@+id/txt_pow"
@@ -152,7 +153,7 @@
                 android:alpha="0.7"
                 android:fontFamily="sans-serif-medium"
                 android:text="^"
-                android:textColor="#FFFFFF"
+                android:textColor="?attr/colorOnSurface"
                 android:textSize="24sp" />
             <TextView
                 android:id="@+id/txt_percent"
@@ -165,7 +166,7 @@
                 android:alpha="0.7"
                 android:fontFamily="sans-serif-medium"
                 android:text="%"
-                android:textColor="#FFFFFF"
+                android:textColor="?attr/colorOnSurface"
                 android:textSize="24sp" />
           </RelativeLayout>
         </RelativeLayout>
@@ -184,14 +185,14 @@
             android:layout_marginBottom="8dp"
             android:layout_marginTop="10dp"
             android:text="@string/history_title"
-            android:textColor="#FFFFFF"
+            android:textColor="?attr/colorOnSurface"
             android:textSize="20sp" />
         <TextView
             android:id="@+id/history_empty"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/history_empty"
-            android:textColor="#BDBDBD" />
+            android:textColor="?attr/colorOnSurfaceVariant" />
         <LinearLayout
             android:id="@+id/history_entries"
             android:layout_width="match_parent"

@@ -18,6 +18,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.doOnLayout
 import androidx.core.view.setPadding
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.color.DynamicColors
 import dev.starpad.calculatorforwear.databinding.ActivityMainBinding
 import net.objecthunter.exp4j.ExpressionBuilder
 import java.time.Instant
@@ -72,6 +73,11 @@ class MainActivity : AppCompatActivity() {
   @SuppressLint("SetTextI18n")
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
+
+    // Wallpaper-derived Material You palette, applied before inflation and scoped to this
+    // activity so only the calculator screen follows the system colors. Devices without dynamic
+    // color support keep the static palette declared by Theme.MyApp.
+    DynamicColors.applyToActivityIfAvailable(this)
 
     binding = ActivityMainBinding.inflate(layoutInflater)
     setContentView(binding.root)
