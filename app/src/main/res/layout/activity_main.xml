@@ -59,10 +59,17 @@
             android:alpha="0"
             android:clickable="false">
 
+          <!--
+            The wrapper stays: it is measured as wrap_content around the glyphs, which are placed
+            relative to its edges, so flattening it into the parent would move them. Left/right
+            margins are deliberate too - the drag angles the calculator matches are fixed, so the
+            menu must not mirror in RTL locales.
+          -->
           <RelativeLayout
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
-              android:layout_centerInParent="true">
+              android:layout_centerInParent="true"
+              tools:ignore="RtlHardcoded,UselessParent">
 
             <TextView
                 android:id="@+id/txt_add"
@@ -72,7 +79,7 @@
                 android:layout_marginTop="120dp"
                 android:alpha="0.7"
                 android:fontFamily="sans-serif-medium"
-                android:text="+"
+                android:text="@string/operator_add"
                 android:textColor="?attr/colorOnSurface"
                 android:textSize="28sp" />
             <TextView
@@ -83,7 +90,7 @@
                 android:layout_marginBottom="120dp"
                 android:alpha="0.7"
                 android:fontFamily="sans-serif-medium"
-                android:text="-"
+                android:text="@string/operator_subtract"
                 android:textColor="?attr/colorOnSurface"
                 android:textSize="28sp" />
             <TextView
@@ -94,7 +101,7 @@
                 android:layout_marginLeft="120dp"
                 android:alpha="0.7"
                 android:fontFamily="sans-serif-medium"
-                android:text="×"
+                android:text="@string/operator_multiply"
                 android:textColor="?attr/colorOnSurface"
                 android:textSize="28sp" />
             <TextView
@@ -105,7 +112,7 @@
                 android:layout_marginRight="120dp"
                 android:alpha="0.7"
                 android:fontFamily="sans-serif-medium"
-                android:text="÷"
+                android:text="@string/operator_divide"
                 android:textColor="?attr/colorOnSurface"
                 android:textSize="28sp" />
             <TextView
@@ -115,7 +122,7 @@
                 android:layout_centerInParent="true"
                 android:alpha="0.7"
                 android:fontFamily="sans-serif-medium"
-                android:text="="
+                android:text="@string/operator_equals"
                 android:textColor="?attr/colorOnSurface"
                 android:textSize="28sp" />
             <ImageView
@@ -127,6 +134,7 @@
                 android:layout_marginLeft="18dp"
                 android:layout_marginTop="32dp"
                 android:alpha="0.7"
+                android:contentDescription="@null"
                 android:src="@drawable/ic_baseline_backspace_24"
                 app:tint="?attr/colorOnSurface" />
             <TextView
@@ -139,7 +147,7 @@
                 android:layout_marginRight="22dp"
                 android:alpha="0.7"
                 android:fontFamily="sans-serif-medium"
-                android:text="."
+                android:text="@string/operator_decimal"
                 android:textColor="?attr/colorOnSurface"
                 android:textSize="28sp" />
             <TextView
@@ -152,7 +160,7 @@
                 android:layout_marginTop="26dp"
                 android:alpha="0.7"
                 android:fontFamily="sans-serif-medium"
-                android:text="^"
+                android:text="@string/operator_power"
                 android:textColor="?attr/colorOnSurface"
                 android:textSize="24sp" />
             <TextView
@@ -165,7 +173,7 @@
                 android:layout_marginLeft="18dp"
                 android:alpha="0.7"
                 android:fontFamily="sans-serif-medium"
-                android:text="%"
+                android:text="@string/operator_percent"
                 android:textColor="?attr/colorOnSurface"
                 android:textSize="24sp" />
           </RelativeLayout>

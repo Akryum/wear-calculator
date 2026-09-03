@@ -28,6 +28,7 @@ class TutorialActivityTest {
   @After
   fun clearProgressAfterTest() {
     preferences().edit().clear().commit()
+    TutorialReplay.consume(ApplicationProvider.getApplicationContext())
   }
 
   @Test
@@ -139,6 +140,31 @@ class TutorialActivityTest {
       }
     }
     assertTrue(TutorialProgressStore(ApplicationProvider.getApplicationContext()).isComplete())
+  }
+
+  @Test
+  fun replayRequestedFromSettingsReplaysTutorialExactlyOnce() {
+    val context = ApplicationProvider.getApplicationContext<Context>()
+    TutorialProgressStore(context).markComplete()
+    // Settings only stores the request and finishes, so the calculator picks it up when it resumes.
+    TutorialReplay.request(context)
+
+    ActivityScenario.launch(MainActivity::class.java).use { scenario ->
+      waitForCarousel()
+      scenario.onActivity { activity ->
+        assertEquals(View.VISIBLE, activity.findViewById<View>(R.id.tutorial_container).visibility)
+        assertEquals(
+          activity.getString(R.string.tutorial_tap_number_title),
+          pageFor(activity, TutorialStep.TAP_NUMBER).findViewById<TextView>(R.id.tutorial_title).text,
+        )
+      }
+    }
+
+    ActivityScenario.launch(MainActivity::class.java).use { scenario ->
+      scenario.onActivity { activity ->
+        assertEquals(View.GONE, activity.findViewById<View>(R.id.tutorial_container).visibility)
+      }
+    }
   }
 
   private fun pageFor(activity: MainActivity, step: TutorialStep): View {

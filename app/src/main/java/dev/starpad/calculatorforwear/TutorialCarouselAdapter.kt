@@ -1,5 +1,6 @@
 package dev.starpad.calculatorforwear
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.view.Gravity
@@ -37,7 +38,12 @@ internal class TutorialCarouselAdapter(
 /** Holds one reusable full-screen tutorial page. */
 internal class TutorialPageViewHolder(val page: TutorialPageView) : RecyclerView.ViewHolder(page)
 
-/** Displays one animated gesture explanation and its action button. */
+/**
+ * Displays one animated gesture explanation and its action button. Built only by
+ * [TutorialCarouselAdapter], never inflated from a layout, so it takes its callback directly
+ * instead of the attribute-set constructors the layout editor looks for.
+ */
+@SuppressLint("ViewConstructor")
 internal class TutorialPageView(
   context: Context,
   onFinishTutorial: () -> Unit,

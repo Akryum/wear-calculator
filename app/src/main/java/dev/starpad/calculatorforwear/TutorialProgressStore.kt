@@ -1,6 +1,7 @@
 package dev.starpad.calculatorforwear
 
 import android.content.Context
+import androidx.core.content.edit
 
 /** Steps presented by the first-run gesture tutorial. */
 enum class TutorialStep {
@@ -28,15 +29,15 @@ class TutorialProgressStore(context: Context) {
 
   /** Saves progress after a scene has been reached. */
   fun saveStep(step: TutorialStep) {
-    preferences.edit().putInt(KEY_STEP, step.ordinal).apply()
+    preferences.edit { putInt(KEY_STEP, step.ordinal) }
   }
 
   /** Makes tutorial permanently hidden for current app data. */
   fun markComplete() {
-    preferences.edit()
-      .putBoolean(KEY_COMPLETE, true)
-      .remove(KEY_STEP)
-      .apply()
+    preferences.edit {
+      putBoolean(KEY_COMPLETE, true)
+      remove(KEY_STEP)
+    }
   }
 
   companion object {

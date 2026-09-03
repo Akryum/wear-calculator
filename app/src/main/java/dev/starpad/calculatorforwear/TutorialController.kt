@@ -7,6 +7,7 @@ import android.view.Gravity
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.LinearLayout
+import androidx.core.view.isNotEmpty
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
@@ -64,7 +65,7 @@ class TutorialController(
   }
 
   private fun buildOverlay() {
-    if (container.childCount > 0) return
+    if (container.isNotEmpty()) return
 
     container.setBackgroundColor(Color.BLACK)
     container.isClickable = true

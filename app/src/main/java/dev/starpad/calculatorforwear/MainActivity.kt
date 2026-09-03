@@ -70,7 +70,9 @@ class MainActivity : AppCompatActivity() {
   // Animation
   private var shortAnimationDuration: Int = 0
 
-  @SuppressLint("SetTextI18n")
+  // The calculator page is a drag surface for the radial menu, never a click target: the digits
+  // around it are real buttons, so there is no click for performClick to report to accessibility.
+  @SuppressLint("SetTextI18n", "ClickableViewAccessibility")
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
 
@@ -158,21 +160,16 @@ class MainActivity : AppCompatActivity() {
     binding.settingsButton.setOnClickListener {
       startActivity(Intent(this, SettingsActivity::class.java))
     }
-    renderHistory()
 
     tutorialController = TutorialController(this, binding.tutorialContainer)
-    if (TutorialReplay.consume(this)) tutorialController.showReplay() else tutorialController.showIfNeeded()
+    tutorialController.showIfNeeded()
   }
 
   override fun onResume() {
     super.onResume()
-    if (::historyStore.isInitialized) renderHistory()
-  }
-
-  override fun onNewIntent(intent: Intent) {
-    super.onNewIntent(intent)
-    setIntent(intent)
-    if (::tutorialController.isInitialized && TutorialReplay.consume(this)) tutorialController.showReplay()
+    renderHistory()
+    // Settings only stores the replay request and finishes, so the calculator picks it up here.
+    if (TutorialReplay.consume(this)) tutorialController.showReplay()
   }
 
   override fun onStart() {

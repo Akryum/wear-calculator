@@ -1,6 +1,7 @@
 package dev.starpad.calculatorforwear
 
 import android.content.Context
+import androidx.core.content.edit
 
 /** Stores user-controlled calculator behavior. */
 class CalculatorSettingsStore(context: Context) {
@@ -11,7 +12,7 @@ class CalculatorSettingsStore(context: Context) {
 
   /** Updates touch feedback preference. */
   fun setHapticsEnabled(enabled: Boolean) {
-    preferences.edit().putBoolean(KEY_HAPTICS_ENABLED, enabled).apply()
+    preferences.edit { putBoolean(KEY_HAPTICS_ENABLED, enabled) }
   }
 
   companion object {

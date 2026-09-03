@@ -50,7 +50,7 @@ fun SettingsScreen(
       TransformingLazyColumn(state = columnState, contentPadding = contentPadding) {
         item {
           ListHeader(
-            modifier = listItemModifier(transformationSpec),
+            modifier = Modifier.listItem(this@item, transformationSpec),
             transformation = SurfaceTransformation(transformationSpec),
           ) {
             Text(stringResource(R.string.settings_title))
@@ -60,7 +60,7 @@ fun SettingsScreen(
           SwitchButton(
             checked = hapticsEnabled,
             onCheckedChange = onHapticsEnabledChange,
-            modifier = listItemModifier(transformationSpec),
+            modifier = Modifier.listItem(this@item, transformationSpec),
             transformation = SurfaceTransformation(transformationSpec),
             label = { Text(stringResource(R.string.haptics_enabled)) },
           )
@@ -68,7 +68,7 @@ fun SettingsScreen(
         item {
           Button(
             onClick = onShowTutorial,
-            modifier = listItemModifier(transformationSpec),
+            modifier = Modifier.listItem(this@item, transformationSpec),
             transformation = SurfaceTransformation(transformationSpec),
             colors = ButtonDefaults.filledTonalButtonColors(),
             label = { Text(stringResource(R.string.show_tutorial)) },
@@ -77,7 +77,7 @@ fun SettingsScreen(
         item {
           Button(
             onClick = { confirmingClearHistory = true },
-            modifier = listItemModifier(transformationSpec),
+            modifier = Modifier.listItem(this@item, transformationSpec),
             transformation = SurfaceTransformation(transformationSpec),
             colors = destructiveButtonColors(),
             label = { Text(stringResource(R.string.clear_history)) },
@@ -98,8 +98,8 @@ fun SettingsScreen(
 }
 
 /** Full-width item sized so the list can scale and morph it while scrolling. */
-private fun TransformingLazyColumnItemScope.listItemModifier(spec: TransformationSpec) =
-  Modifier.fillMaxWidth().transformedHeight(this, spec)
+private fun Modifier.listItem(scope: TransformingLazyColumnItemScope, spec: TransformationSpec) =
+  fillMaxWidth().transformedHeight(scope, spec)
 
 /** Confirmation for the destructive history reset, dismissible by cancel, back, or swipe. */
 @Composable

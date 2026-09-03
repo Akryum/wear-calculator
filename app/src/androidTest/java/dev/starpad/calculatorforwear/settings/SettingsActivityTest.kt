@@ -30,6 +30,9 @@ class SettingsActivityTest {
     settingsStore.setHapticsEnabled(true)
   }
 
+  // The platform marks windowSwipeToDismiss deprecated ("isn't functional anymore") on recent
+  // releases, but the app still supports Wear devices from API 30 where the attribute is honored.
+  @Suppress("DEPRECATION")
   @Test
   fun activityThemeEnablesSwipeToDismiss() {
     val attributes = composeRule.activity.theme

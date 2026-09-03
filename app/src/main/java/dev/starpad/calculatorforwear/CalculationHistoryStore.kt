@@ -1,6 +1,7 @@
 package dev.starpad.calculatorforwear
 
 import android.content.Context
+import androidx.core.content.edit
 import org.json.JSONArray
 import org.json.JSONObject
 
@@ -35,7 +36,7 @@ class CalculationHistoryStore(context: Context) {
 
   /** Removes every saved calculation. */
   fun clear() {
-    preferences.edit().remove(KEY_HISTORY).apply()
+    preferences.edit { remove(KEY_HISTORY) }
   }
 
   private fun save(entries: List<CalculationHistoryEntry>) {
@@ -46,7 +47,7 @@ class CalculationHistoryStore(context: Context) {
         put(KEY_RESULT, entry.result)
       })
     }
-    preferences.edit().putString(KEY_HISTORY, values.toString()).apply()
+    preferences.edit { putString(KEY_HISTORY, values.toString()) }
   }
 
   companion object {

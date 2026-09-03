@@ -25,8 +25,13 @@
     <string name="clear_history_message">Remove all saved calculations from this watch?</string>
     <string name="clear_history_confirm">Clear</string>
 
-    <!--
-    This string is used for square devices and overridden by hello_world in
-    values-round/strings.xml for round devices.
-    -->
+    <!-- Radial menu glyphs: math symbols read the same in every language, so they stay untranslated. -->
+    <string name="operator_add" translatable="false">+</string>
+    <string name="operator_subtract" translatable="false">-</string>
+    <string name="operator_multiply" translatable="false">×</string>
+    <string name="operator_divide" translatable="false">÷</string>
+    <string name="operator_equals" translatable="false">=</string>
+    <string name="operator_decimal" translatable="false">.</string>
+    <string name="operator_power" translatable="false">^</string>
+    <string name="operator_percent" translatable="false">%</string>
 </resources>

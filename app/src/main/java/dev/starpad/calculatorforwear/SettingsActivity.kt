@@ -29,8 +29,8 @@ class SettingsActivity : ComponentActivity() {
             settingsStore.setHapticsEnabled(enabled)
           },
           onShowTutorial = {
-            finish()
             TutorialReplay.request(this)
+            finish()
           },
           onClearHistory = historyStore::clear,
         )
