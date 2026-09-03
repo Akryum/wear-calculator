@@ -18,6 +18,11 @@
             android:value="true" />
 
         <activity
+            android:name=".SettingsActivity"
+            android:exported="false"
+            android:label="@string/settings_title" />
+
+        <activity
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/launcher_name">

@@ -59,6 +59,7 @@ class TutorialIllustrationView @JvmOverloads constructor(
       TutorialStep.TAP_NUMBER -> drawNumberTap(canvas, centerX, centerY, radius)
       TutorialStep.DRAG_ACTION -> drawActionDrag(canvas, centerX, centerY, radius)
       TutorialStep.CLEAR_INPUT -> drawClearGesture(canvas, centerX, centerY, radius)
+      TutorialStep.SCROLL_HISTORY -> drawHistoryScroll(canvas, centerX, centerY, radius)
     }
   }
 
@@ -141,6 +142,19 @@ class TutorialIllustrationView @JvmOverloads constructor(
     paint.strokeCap = Paint.Cap.ROUND
     canvas.drawLine(x - radius * 0.35f, y - radius * 0.22f, targetX + radius * 0.28f, targetY + radius * 0.18f, paint)
     drawFinger(canvas, fingerX, fingerY, radius * 0.24f, if (holding) 1.2f else 1f)
+  }
+
+  private fun drawHistoryScroll(canvas: Canvas, x: Float, y: Float, radius: Float) {
+    val progress = (phase / 0.7f).coerceIn(0f, 1f)
+    val offset = radius * progress
+    paint.style = Paint.Style.STROKE
+    paint.strokeWidth = radius * 0.08f
+    paint.color = Color.rgb(105, 105, 105)
+    repeat(3) { index ->
+      val rowY = y - radius * 0.1f + index * radius * 0.36f - offset
+      canvas.drawLine(x - radius * 0.6f, rowY, x + radius * 0.6f, rowY, paint)
+    }
+    drawFinger(canvas, x, y + radius * 0.55f - offset, radius * 0.22f, 1f)
   }
 
   private fun drawCircle(canvas: Canvas, x: Float, y: Float, radius: Float, active: Boolean) {

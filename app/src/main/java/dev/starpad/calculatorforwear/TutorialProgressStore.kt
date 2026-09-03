@@ -6,7 +6,8 @@ import android.content.Context
 enum class TutorialStep {
   TAP_NUMBER,
   DRAG_ACTION,
-  CLEAR_INPUT;
+  CLEAR_INPUT,
+  SCROLL_HISTORY;
 
   /** Returns following tutorial step, or null after final step. */
   fun next(): TutorialStep? = entries.getOrNull(ordinal + 1)

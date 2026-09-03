@@ -2,7 +2,7 @@
 <resources>
   <string name="app_name">Calculatrice pour Montre</string>
   <string name="launcher_name">Calculatrice</string>
-  <string name="tutorial_progress">Tutoriel %1$d sur %2$d</string>
+  <string name="tutorial_page_description">Page %1$d sur %2$d du tutoriel</string>
   <string name="tutorial_tap_number_title">Touchez les chiffres</string>
   <string name="tutorial_tap_number_body">Touchez un chiffre sur le bord.</string>
   <string name="tutorial_drag_action_title">Choisissez une action</string>
@@ -13,5 +13,16 @@
   <string name="tutorial_done">Terminé</string>
   <string name="tutorial_skip_description">Passer le tutoriel</string>
   <string name="tutorial_done_description">Terminer le tutoriel</string>
-  <string name="tutorial_next_description">Touchez pour continuer le tutoriel</string>
+  <string name="tutorial_history_title">Voir les calculs</string>
+  <string name="tutorial_history_body">Balayez vers le haut pour voir calculs et réglages.</string>
+  <string name="history_title">Historique</string>
+  <string name="history_empty">Aucun calcul</string>
+  <string name="history_entry">%1$s = %2$s</string>
+  <string name="settings_title">Réglages</string>
+  <string name="haptics_enabled">Retour haptique</string>
+  <string name="show_tutorial">Afficher tutoriel</string>
+  <string name="clear_history">Effacer historique</string>
+  <string name="clear_history_title">Effacer historique ?</string>
+  <string name="clear_history_message">Supprimer tous les calculs enregistrés ?</string>
+  <string name="clear_history_confirm">Effacer</string>
 </resources>

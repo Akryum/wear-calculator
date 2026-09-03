@@ -2,7 +2,7 @@
 <resources>
   <string name="app_name">Calculadora para Reloj</string>
   <string name="launcher_name">Calculadora</string>
-  <string name="tutorial_progress">Tutorial %1$d de %2$d</string>
+  <string name="tutorial_page_description">Página %1$d de %2$d del tutorial</string>
   <string name="tutorial_tap_number_title">Toca números</string>
   <string name="tutorial_tap_number_body">Toca cualquier número del borde.</string>
   <string name="tutorial_drag_action_title">Elige una acción</string>
@@ -13,5 +13,16 @@
   <string name="tutorial_done">Listo</string>
   <string name="tutorial_skip_description">Omitir tutorial</string>
   <string name="tutorial_done_description">Terminar tutorial</string>
-  <string name="tutorial_next_description">Toca para continuar el tutorial</string>
+  <string name="tutorial_history_title">Revisa cálculos</string>
+  <string name="tutorial_history_body">Desliza hacia arriba para ver cálculos y Ajustes.</string>
+  <string name="history_title">Historial</string>
+  <string name="history_empty">Todavía no hay cálculos</string>
+  <string name="history_entry">%1$s = %2$s</string>
+  <string name="settings_title">Ajustes</string>
+  <string name="haptics_enabled">Vibración</string>
+  <string name="show_tutorial">Mostrar tutorial</string>
+  <string name="clear_history">Borrar historial</string>
+  <string name="clear_history_title">¿Borrar historial?</string>
+  <string name="clear_history_message">¿Eliminar todos los cálculos guardados?</string>
+  <string name="clear_history_confirm">Borrar</string>
 </resources>

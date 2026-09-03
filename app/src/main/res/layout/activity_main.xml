@@ -1,164 +1,213 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.wear.widget.BoxInsetLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="@dimen/box_inset_layout_padding"
     tools:context=".MainActivity"
     tools:deviceIds="wear">
 
-  <FrameLayout
-      android:id="@+id/main_text_layout"
+  <androidx.core.widget.NestedScrollView
+      android:id="@+id/calculator_scroll"
       android:layout_width="match_parent"
-      android:layout_height="match_parent"
-      android:padding="@dimen/inner_frame_layout_padding"
-      app:layout_boxedEdges="all"
-      android:clickable="false">
+      android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/txt_input"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:textSize="20sp"
-        android:textColor="#FFFFFF"/>
-    <TextView
-        android:id="@+id/txt_result"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:textSize="20sp"/>
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-  </FrameLayout>
+      <androidx.wear.widget.BoxInsetLayout
+          android:id="@+id/calculator_page"
+          android:layout_width="match_parent"
+          android:layout_height="0dp"
+          android:padding="@dimen/box_inset_layout_padding">
 
-  <RelativeLayout
-      android:id="@+id/digits_layout"
-      android:layout_width="match_parent"
-      android:layout_height="match_parent" />
+        <FrameLayout
+            android:id="@+id/main_text_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clickable="false"
+            android:padding="@dimen/inner_frame_layout_padding"
+            app:layout_boxedEdges="all">
 
-  <RelativeLayout
-      android:id="@+id/center_menu_layout"
-      android:layout_width="match_parent"
-      android:layout_height="match_parent"
-      android:alpha="0"
-      android:clickable="false">
+          <TextView
+              android:id="@+id/txt_input"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:gravity="center"
+              android:textColor="#FFFFFF"
+              android:textSize="20sp" />
+          <TextView
+              android:id="@+id/txt_result"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:gravity="center"
+              android:textColor="#FFFFFF"
+              android:textSize="20sp" />
+        </FrameLayout>
 
-      <RelativeLayout
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:layout_centerInParent="true">
-        <TextView
-            android:id="@+id/txt_add"
-            android:alpha="0.7"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="+"
-            android:textSize="28sp"
-            android:layout_marginTop="120dp"
-            android:layout_centerHorizontal="true"
-            android:fontFamily="sans-serif-medium"
-            android:textColor="#FFFFFF"/>
-        <TextView
-            android:id="@+id/txt_subtract"
-            android:alpha="0.7"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="-"
-            android:textSize="28sp"
-            android:layout_marginBottom="120dp"
-            android:layout_centerHorizontal="true"
-            android:fontFamily="sans-serif-medium"
-            android:textColor="#FFFFFF"/>
-        <TextView
-            android:id="@+id/txt_multiply"
-            android:alpha="0.7"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="×"
-            android:textSize="28sp"
-            android:layout_marginLeft="120dp"
-            android:layout_centerVertical="true"
-            android:fontFamily="sans-serif-medium"
-            android:textColor="#FFFFFF"/>
-        <TextView
-            android:id="@+id/txt_divide"
-            android:alpha="0.7"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="÷"
-            android:textSize="28sp"
-            android:layout_marginRight="120dp"
-            android:layout_centerVertical="true"
-            android:fontFamily="sans-serif-medium"
-            android:textColor="#FFFFFF"/>
-        <TextView
-            android:id="@+id/txt_equal"
-            android:alpha="0.7"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="="
-            android:textSize="28sp"
-            android:layout_centerInParent="true"
-            android:fontFamily="sans-serif-medium"
-            android:textColor="#FFFFFF"/>
+        <RelativeLayout
+            android:id="@+id/digits_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
-        <ImageView
-            android:id="@+id/img_backspace"
-            android:alpha="0.7"
-            android:src="@drawable/ic_baseline_backspace_24"
-            android:layout_width="16dp"
-            android:layout_height="16dp"
-            android:layout_alignTop="@id/txt_subtract"
-            android:layout_alignLeft="@id/txt_divide"
-            android:layout_marginTop="32dp"
-            android:layout_marginLeft="18dp"/>
+        <RelativeLayout
+            android:id="@+id/center_menu_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:alpha="0"
+            android:clickable="false">
 
-        <TextView
-            android:id="@+id/txt_dot"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@id/txt_add"
-            android:layout_alignRight="@id/txt_multiply"
-            android:layout_marginRight="22dp"
-            android:layout_marginBottom="22dp"
-            android:alpha="0.7"
-            android:fontFamily="sans-serif-medium"
-            android:text="."
-            android:textColor="#FFFFFF"
-            android:textSize="28sp" />
+          <RelativeLayout
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_centerInParent="true">
 
-        <TextView
-            android:id="@+id/txt_pow"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignTop="@id/txt_subtract"
-            android:layout_alignRight="@id/txt_multiply"
-            android:layout_marginRight="20dp"
-            android:layout_marginTop="26dp"
-            android:alpha="0.7"
-            android:fontFamily="sans-serif-medium"
-            android:text="^"
-            android:textColor="#FFFFFF"
-            android:textSize="24sp" />
-
-        <TextView
-            android:id="@+id/txt_percent"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignBottom="@id/txt_add"
-            android:layout_alignLeft="@id/txt_divide"
-            android:layout_marginLeft="18dp"
-            android:layout_marginBottom="18dp"
-            android:alpha="0.7"
-            android:fontFamily="sans-serif-medium"
-            android:text="%"
-            android:textColor="#FFFFFF"
-            android:textSize="24sp" />
-
+            <TextView
+                android:id="@+id/txt_add"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="120dp"
+                android:alpha="0.7"
+                android:fontFamily="sans-serif-medium"
+                android:text="+"
+                android:textColor="#FFFFFF"
+                android:textSize="28sp" />
+            <TextView
+                android:id="@+id/txt_subtract"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="120dp"
+                android:alpha="0.7"
+                android:fontFamily="sans-serif-medium"
+                android:text="-"
+                android:textColor="#FFFFFF"
+                android:textSize="28sp" />
+            <TextView
+                android:id="@+id/txt_multiply"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="120dp"
+                android:alpha="0.7"
+                android:fontFamily="sans-serif-medium"
+                android:text="×"
+                android:textColor="#FFFFFF"
+                android:textSize="28sp" />
+            <TextView
+                android:id="@+id/txt_divide"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="120dp"
+                android:alpha="0.7"
+                android:fontFamily="sans-serif-medium"
+                android:text="÷"
+                android:textColor="#FFFFFF"
+                android:textSize="28sp" />
+            <TextView
+                android:id="@+id/txt_equal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:alpha="0.7"
+                android:fontFamily="sans-serif-medium"
+                android:text="="
+                android:textColor="#FFFFFF"
+                android:textSize="28sp" />
+            <ImageView
+                android:id="@+id/img_backspace"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_alignLeft="@id/txt_divide"
+                android:layout_alignTop="@id/txt_subtract"
+                android:layout_marginLeft="18dp"
+                android:layout_marginTop="32dp"
+                android:alpha="0.7"
+                android:src="@drawable/ic_baseline_backspace_24" />
+            <TextView
+                android:id="@+id/txt_dot"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@id/txt_add"
+                android:layout_alignRight="@id/txt_multiply"
+                android:layout_marginBottom="22dp"
+                android:layout_marginRight="22dp"
+                android:alpha="0.7"
+                android:fontFamily="sans-serif-medium"
+                android:text="."
+                android:textColor="#FFFFFF"
+                android:textSize="28sp" />
+            <TextView
+                android:id="@+id/txt_pow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignRight="@id/txt_multiply"
+                android:layout_alignTop="@id/txt_subtract"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="26dp"
+                android:alpha="0.7"
+                android:fontFamily="sans-serif-medium"
+                android:text="^"
+                android:textColor="#FFFFFF"
+                android:textSize="24sp" />
+            <TextView
+                android:id="@+id/txt_percent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@id/txt_add"
+                android:layout_alignLeft="@id/txt_divide"
+                android:layout_marginBottom="18dp"
+                android:layout_marginLeft="18dp"
+                android:alpha="0.7"
+                android:fontFamily="sans-serif-medium"
+                android:text="%"
+                android:textColor="#FFFFFF"
+                android:textSize="24sp" />
+          </RelativeLayout>
         </RelativeLayout>
+      </androidx.wear.widget.BoxInsetLayout>
 
-  </RelativeLayout>
+      <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:gravity="center_horizontal"
+          android:orientation="vertical"
+          android:padding="@dimen/inner_frame_layout_padding">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:layout_marginTop="10dp"
+            android:text="@string/history_title"
+            android:textColor="#FFFFFF"
+            android:textSize="20sp" />
+        <TextView
+            android:id="@+id/history_empty"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/history_empty"
+            android:textColor="#BDBDBD" />
+        <LinearLayout
+            android:id="@+id/history_entries"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/settings_button"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="12dp"
+            android:layout_marginTop="12dp"
+            android:text="@string/settings_title" />
+      </LinearLayout>
+    </LinearLayout>
+  </androidx.core.widget.NestedScrollView>
 
   <FrameLayout
       android:id="@+id/tutorial_container"
@@ -167,5 +216,4 @@
       android:clickable="true"
       android:focusable="true"
       android:visibility="gone" />
-
-</androidx.wear.widget.BoxInsetLayout>
+</FrameLayout>

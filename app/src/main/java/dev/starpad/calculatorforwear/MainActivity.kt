@@ -1,16 +1,21 @@
 package dev.starpad.calculatorforwear
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
+import android.text.TextUtils
 import android.util.Log
+import android.view.HapticFeedbackConstants
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.doOnLayout
 import androidx.core.view.setPadding
 import com.google.android.material.button.MaterialButton
 import dev.starpad.calculatorforwear.databinding.ActivityMainBinding
@@ -24,6 +29,8 @@ import kotlin.math.*
 class MainActivity : AppCompatActivity() {
   private lateinit var binding: ActivityMainBinding
   private lateinit var tutorialController: TutorialController
+  private lateinit var historyStore: CalculationHistoryStore
+  private lateinit var settingsStore: CalculatorSettingsStore
 
   private var activity = this
 
@@ -68,6 +75,9 @@ class MainActivity : AppCompatActivity() {
 
     binding = ActivityMainBinding.inflate(layoutInflater)
     setContentView(binding.root)
+
+    historyStore = CalculationHistoryStore(this)
+    settingsStore = CalculatorSettingsStore(this)
 
     mainTextLayout = findViewById(R.id.main_text_layout)
     centerMenuLayout = findViewById(R.id.center_menu_layout)
@@ -124,6 +134,7 @@ class MainActivity : AppCompatActivity() {
         currentInputTextView?.text = "${currentInputTextView?.text}$i"
         currentInputTextView?.alpha = 1f
         resultTextView?.alpha = 0f
+        haptic(button, HapticFeedbackConstants.CLOCK_TICK)
       }
 
       digitBtnsLayout!!.addView(button)
@@ -132,8 +143,30 @@ class MainActivity : AppCompatActivity() {
     // Animation
     shortAnimationDuration = resources.getInteger(android.R.integer.config_shortAnimTime)
 
+    binding.calculatorScroll.doOnLayout { scroll ->
+      binding.calculatorPage.layoutParams = binding.calculatorPage.layoutParams.apply {
+        height = scroll.height
+      }
+    }
+    binding.calculatorPage.setOnTouchListener { _, event -> handleCalculatorPageTouch(event) }
+    binding.settingsButton.setOnClickListener {
+      startActivity(Intent(this, SettingsActivity::class.java))
+    }
+    renderHistory()
+
     tutorialController = TutorialController(this, binding.tutorialContainer)
-    tutorialController.showIfNeeded()
+    if (TutorialReplay.consume(this)) tutorialController.showReplay() else tutorialController.showIfNeeded()
+  }
+
+  override fun onResume() {
+    super.onResume()
+    if (::historyStore.isInitialized) renderHistory()
+  }
+
+  override fun onNewIntent(intent: Intent) {
+    super.onNewIntent(intent)
+    setIntent(intent)
+    if (::tutorialController.isInitialized && TutorialReplay.consume(this)) tutorialController.showReplay()
   }
 
   override fun onStart() {
@@ -147,7 +180,19 @@ class MainActivity : AppCompatActivity() {
   }
 
   @SuppressLint("SetTextI18n")
-  override fun onTouchEvent(event: MotionEvent): Boolean {
+  private fun handleCalculatorPageTouch(event: MotionEvent): Boolean {
+    if (event.action == MotionEvent.ACTION_DOWN) {
+      val dX = event.x - screenWidth / 2
+      val dY = event.y - screenHeight / 2
+      val threshold = (digitBtnWidth + digitBtnHeight) / 2
+      if (sqrt(dX.pow(2) + dY.pow(2)) >= threshold) return false
+      binding.calculatorScroll.requestDisallowInterceptTouchEvent(true)
+    }
+    return onCalculatorTouch(event)
+  }
+
+  @SuppressLint("SetTextI18n")
+  private fun onCalculatorTouch(event: MotionEvent): Boolean {
     return when (event.action) {
       MotionEvent.ACTION_DOWN -> {
         Log.d("TOUCH", "Action was DOWN: ${event.x};${event.y}")
@@ -246,7 +291,8 @@ class MainActivity : AppCompatActivity() {
 
         if (choice == "=") {
           try {
-            var input = currentInputTextView!!.text as String
+            val displayExpression = currentInputTextView!!.text.toString()
+            var input = displayExpression
             input = input.replace("×", "*")
             input = input.replace("÷", "/")
 
@@ -261,36 +307,44 @@ class MainActivity : AppCompatActivity() {
 
             val result = ExpressionBuilder(input).build().evaluate() as Number
 
-            if (result.toFloat().rem(1.0) == 0.0) {
-              resultTextView?.text = result.toInt().toString()
+            val formattedResult = if (result.toFloat().rem(1.0) == 0.0) {
+              result.toInt().toString()
             } else {
-              resultTextView?.text = "%.2f".format(result)
+              "%.2f".format(result)
             }
 
+            resultTextView?.text = formattedResult
             currentInputTextView?.alpha = 0f
             resultTextView?.alpha = 1f
-            currentInputTextView?.text = resultTextView?.text
+            currentInputTextView?.text = formattedResult
+            historyStore.append(displayExpression, formattedResult)
+            renderHistory()
+            haptic(binding.calculatorPage, HapticFeedbackConstants.CONFIRM)
           } catch (e: Exception) {
             Log.d("INPUT", "Input error ${e}")
           }
         } else if (choice == "backspace") {
           if (currentInputTextView?.text == resultTextView?.text || isLongPress) {
+            val hadInput = !currentInputTextView?.text.isNullOrEmpty()
             currentInputTextView?.text = ""
             resultTextView?.alpha = 0.5f
+            if (hadInput) haptic(binding.calculatorPage, HapticFeedbackConstants.CONFIRM)
           } else if (currentInputTextView?.text!!.isNotEmpty()) {
             resultTextView?.text = ""
             currentInputTextView?.text =
               currentInputTextView?.text?.substring(0, currentInputTextView?.text!!.length - 1)
+            haptic(binding.calculatorPage, HapticFeedbackConstants.CLOCK_TICK)
           }
         } else {
           currentInputTextView?.text = "${currentInputTextView?.text}$choice"
           currentInputTextView?.alpha = 1f
           resultTextView?.alpha = 0f
+          haptic(binding.calculatorPage, HapticFeedbackConstants.CLOCK_TICK)
         }
 
         true
       }
-      else -> super.onTouchEvent(event)
+      else -> false
     }
   }
 
@@ -308,5 +362,37 @@ class MainActivity : AppCompatActivity() {
 
   private fun resetLongPressButtons () {
     (backspaceView as ImageView).setImageResource(R.drawable.ic_baseline_backspace_24)
+  }
+
+  private fun renderHistory() {
+    val entries = historyStore.load()
+    binding.historyEntries.removeAllViews()
+    binding.historyEmpty.visibility = if (entries.isEmpty()) View.VISIBLE else View.GONE
+    entries.forEach { entry ->
+      val row = MaterialButton(this, null, R.attr.MaterialTextButton).apply {
+        layoutParams = LinearLayout.LayoutParams(
+          LinearLayout.LayoutParams.MATCH_PARENT,
+          LinearLayout.LayoutParams.WRAP_CONTENT,
+        )
+        text = getString(R.string.history_entry, entry.expression, entry.result)
+        isAllCaps = false
+        isSingleLine = true
+        ellipsize = TextUtils.TruncateAt.END
+        contentDescription = text
+        setOnClickListener { restoreHistoryResult(entry.result) }
+      }
+      binding.historyEntries.addView(row)
+    }
+  }
+
+  private fun restoreHistoryResult(result: String) {
+    currentInputTextView?.text = result
+    currentInputTextView?.alpha = 1f
+    resultTextView?.alpha = 0f
+    binding.calculatorScroll.post { binding.calculatorScroll.smoothScrollTo(0, 0) }
+  }
+
+  private fun haptic(view: View, feedback: Int) {
+    if (settingsStore.hapticsEnabled()) view.performHapticFeedback(feedback)
   }
 }

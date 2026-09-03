@@ -2,15 +2,15 @@ package dev.starpad.calculatorforwear
 
 import android.content.Context
 import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.view.Gravity
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.LinearLayout
-import android.widget.TextView
-import androidx.core.view.ViewCompat
 import androidx.core.view.isVisible
-import androidx.core.view.setPadding
-import com.google.android.material.button.MaterialButton
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.PagerSnapHelper
+import androidx.recyclerview.widget.RecyclerView
 
 /** Owns tutorial overlay presentation without coupling it to calculator input state. */
 class TutorialController(
@@ -18,14 +18,13 @@ class TutorialController(
   private val container: FrameLayout,
 ) {
   private val progressStore = TutorialProgressStore(context)
-  private lateinit var illustration: TutorialIllustrationView
-  private lateinit var progress: TextView
-  private lateinit var title: TextView
-  private lateinit var body: TextView
-  private lateinit var action: MaterialButton
-  private lateinit var copy: LinearLayout
+  private lateinit var carousel: RecyclerView
+  private lateinit var carouselLayoutManager: LinearLayoutManager
+  private lateinit var indicator: LinearLayout
+  private lateinit var dots: List<View>
+  private val snapHelper = PagerSnapHelper()
   private var step = TutorialStep.TAP_NUMBER
-  private var isTransitioning = false
+  private var isReplay = false
 
   /** Shows unfinished tutorial, if any. */
   fun showIfNeeded() {
@@ -34,21 +33,34 @@ class TutorialController(
       return
     }
 
+    isReplay = false
     step = progressStore.currentStep()
-    buildOverlay()
-    renderStep()
-    container.visibility = View.VISIBLE
-    illustration.resumeAnimation()
+    show(step)
+  }
+
+  /** Shows tutorial from its first scene even after first-run tutorial was completed. */
+  fun showReplay() {
+    isReplay = true
+    step = TutorialStep.TAP_NUMBER
+    show(step)
   }
 
   /** Pauses decorative animation while activity is backgrounded. */
   fun onStop() {
-    if (container.isVisible) illustration.pauseAnimation()
+    if (container.isVisible) pauseVisibleIllustrations()
   }
 
-  /** Resumes decorative animation when activity returns. */
+  /** Resumes current page animation when activity returns. */
   fun onStart() {
-    if (container.isVisible) illustration.resumeAnimation()
+    if (container.isVisible) resumeSelectedIllustration()
+  }
+
+  private fun show(initialStep: TutorialStep) {
+    buildOverlay()
+    container.visibility = View.VISIBLE
+    carousel.scrollToPosition(initialStep.ordinal)
+    updateIndicator(initialStep.ordinal)
+    carousel.post { selectPage(initialStep.ordinal, persist = false) }
   }
 
   private fun buildOverlay() {
@@ -57,165 +69,116 @@ class TutorialController(
     container.setBackgroundColor(Color.BLACK)
     container.isClickable = true
     container.isFocusable = true
-    container.setOnClickListener { advance() }
 
-    illustration = TutorialIllustrationView(context).apply {
-      importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+    carouselLayoutManager = LinearLayoutManager(context, RecyclerView.HORIZONTAL, false)
+    carousel = RecyclerView(context).apply {
+      id = R.id.tutorial_carousel
+      layoutManager = carouselLayoutManager
+      adapter = TutorialCarouselAdapter(context, ::finishTutorial)
+      itemAnimator = null
+      isNestedScrollingEnabled = false
+      importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_YES
+      addOnScrollListener(object : RecyclerView.OnScrollListener() {
+        override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+          if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+            selectedSnapPosition()?.let { selectPage(it, persist = true) }
+          } else {
+            pauseVisibleIllustrations()
+          }
+        }
+      })
     }
-    container.addView(illustration, FrameLayout.LayoutParams(
+    snapHelper.attachToRecyclerView(carousel)
+    container.addView(carousel, FrameLayout.LayoutParams(
       FrameLayout.LayoutParams.MATCH_PARENT,
       FrameLayout.LayoutParams.MATCH_PARENT,
     ))
 
-    progress = textView(12f).apply {
-      id = R.id.tutorial_progress
+    indicator = LinearLayout(context).apply {
+      id = R.id.tutorial_page_indicator
       gravity = Gravity.CENTER
+      importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_YES
+      isFocusable = true
+      orientation = LinearLayout.HORIZONTAL
     }
-    container.addView(progress, frameParams(Gravity.TOP or Gravity.CENTER_HORIZONTAL, 0, 12))
-
-    copy = LinearLayout(context).apply {
-      orientation = LinearLayout.VERTICAL
-      gravity = Gravity.CENTER_HORIZONTAL
-      setPadding(dp(14))
-    }
-    title = textView(19f).apply {
-      id = R.id.tutorial_title
-      typeface = android.graphics.Typeface.DEFAULT_BOLD
-      gravity = Gravity.CENTER
-    }
-    body = textView(14f).apply {
-      id = R.id.tutorial_body
-      gravity = Gravity.CENTER
-      maxLines = 2
-      setPadding(0, dp(3), 0, dp(7))
-    }
-    copy.addView(title, LinearLayout.LayoutParams(
-      LinearLayout.LayoutParams.MATCH_PARENT,
-      LinearLayout.LayoutParams.WRAP_CONTENT,
-    ))
-    copy.addView(body, LinearLayout.LayoutParams(
-      LinearLayout.LayoutParams.MATCH_PARENT,
-      LinearLayout.LayoutParams.WRAP_CONTENT,
-    ))
-    action = MaterialButton(context, null, R.attr.MaterialTextButton).apply {
-      id = R.id.tutorial_action_button
-      minHeight = dp(42)
-      minWidth = dp(82)
-      insetTop = 0
-      insetBottom = 0
-      setOnClickListener { finishTutorial() }
-    }
-    copy.addView(action)
-    container.addView(copy, frameParams(Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL, 0, 2))
+    dots = TutorialStep.entries.map { createDot() }
+    dots.forEach(indicator::addView)
+    container.addView(indicator, FrameLayout.LayoutParams(
+      FrameLayout.LayoutParams.WRAP_CONTENT,
+      FrameLayout.LayoutParams.WRAP_CONTENT,
+      Gravity.TOP or Gravity.CENTER_HORIZONTAL,
+    ).apply { topMargin = dp(12) })
   }
 
-  private fun renderStep() {
-    val content = when (step) {
-      TutorialStep.TAP_NUMBER -> TutorialContent(
-        R.string.tutorial_tap_number_title,
-        R.string.tutorial_tap_number_body,
-      )
-      TutorialStep.DRAG_ACTION -> TutorialContent(
-        R.string.tutorial_drag_action_title,
-        R.string.tutorial_drag_action_body,
-      )
-      TutorialStep.CLEAR_INPUT -> TutorialContent(
-        R.string.tutorial_clear_input_title,
-        R.string.tutorial_clear_input_body,
-      )
+  private fun selectedSnapPosition(): Int? {
+    val snapView = snapHelper.findSnapView(carouselLayoutManager) ?: return null
+    return carousel.getChildAdapterPosition(snapView).takeIf { it != RecyclerView.NO_POSITION }
+  }
+
+  private fun selectPage(position: Int, persist: Boolean) {
+    val selectedStep = TutorialStep.entries.getOrNull(position) ?: return
+    step = selectedStep
+    updateIndicator(position)
+    if (persist && !isReplay) progressStore.saveStep(selectedStep)
+    resumeSelectedIllustration()
+  }
+
+  private fun updateIndicator(position: Int) {
+    dots.forEachIndexed { index, dot ->
+      dot.isSelected = index == position
+      val diameter = dp(if (dot.isSelected) ACTIVE_DOT_DIAMETER_DP else DOT_DIAMETER_DP)
+      dot.layoutParams = (dot.layoutParams as LinearLayout.LayoutParams).apply {
+        width = diameter
+        height = diameter
+      }
+      dot.background = dotDrawable(dot.isSelected)
     }
-    progress.text = context.getString(R.string.tutorial_progress, step.ordinal + 1, TutorialStep.entries.size)
-    title.setText(content.title)
-    body.setText(content.body)
-    val isFinalStep = step == TutorialStep.CLEAR_INPUT
-    action.setText(if (isFinalStep) R.string.tutorial_done else R.string.tutorial_skip)
-    action.contentDescription = context.getString(
-      if (isFinalStep) R.string.tutorial_done_description else R.string.tutorial_skip_description,
+    indicator.contentDescription = context.getString(
+      R.string.tutorial_page_description,
+      position + 1,
+      TutorialStep.entries.size,
     )
-    container.contentDescription = if (isFinalStep) null else {
-      context.getString(R.string.tutorial_next_description)
+  }
+
+  private fun createDot(): View = View(context).apply {
+    importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+    layoutParams = LinearLayout.LayoutParams(dp(DOT_DIAMETER_DP), dp(DOT_DIAMETER_DP)).apply {
+      marginStart = dp(DOT_MARGIN_DP)
+      marginEnd = dp(DOT_MARGIN_DP)
     }
-    illustration.showStep(step)
   }
 
-  private fun advance() {
-    val next = step.next() ?: return
-    if (isTransitioning) return
-
-    isTransitioning = true
-    action.isEnabled = false
-    val distance = dp(STEP_TRANSITION_DISTANCE_DP).toFloat()
-
-    progress.animate().alpha(0f).translationY(-distance).setDuration(STEP_EXIT_DURATION_MS).start()
-    illustration.animate().alpha(0f).scaleX(0.94f).scaleY(0.94f).setDuration(STEP_EXIT_DURATION_MS).start()
-    copy.animate()
-      .alpha(0f)
-      .translationY(-distance)
-      .setDuration(STEP_EXIT_DURATION_MS)
-      .withEndAction {
-        step = next
-        progressStore.saveStep(step)
-        resetIncomingScene(distance)
-        renderStep()
-        animateIncomingScene()
-      }
-      .start()
+  private fun dotDrawable(active: Boolean) = GradientDrawable().apply {
+    shape = GradientDrawable.OVAL
+    setColor(if (active) ORANGE else INACTIVE_DOT)
   }
 
-  /** Places new scene below its settled position before fade-and-lift entrance. */
-  private fun resetIncomingScene(distance: Float) {
-    progress.translationY = distance
-    illustration.scaleX = 0.94f
-    illustration.scaleY = 0.94f
-    copy.translationY = distance
+  private fun pauseVisibleIllustrations() {
+    repeat(carousel.childCount) { index -> pageAtChild(index)?.pauseAnimation() }
   }
 
-  /** Reveals next scene after previous scene has fully left screen. */
-  private fun animateIncomingScene() {
-    progress.animate().alpha(1f).translationY(0f).setDuration(STEP_ENTER_DURATION_MS).start()
-    illustration.animate().alpha(1f).scaleX(1f).scaleY(1f).setDuration(STEP_ENTER_DURATION_MS).start()
-    copy.animate()
-      .alpha(1f)
-      .translationY(0f)
-      .setDuration(STEP_ENTER_DURATION_MS)
-      .withEndAction {
-        isTransitioning = false
-        action.isEnabled = true
-      }
-      .start()
+  private fun resumeSelectedIllustration() {
+    repeat(carousel.childCount) { index ->
+      val page = pageAtChild(index) ?: return@repeat
+      if (carousel.getChildAdapterPosition(page) == step.ordinal) page.resumeAnimation() else page.pauseAnimation()
+    }
   }
+
+  private fun pageAtChild(index: Int): TutorialPageView? = carousel.getChildAt(index) as? TutorialPageView
 
   private fun finishTutorial() {
     progressStore.markComplete()
-    illustration.pauseAnimation()
+    pauseVisibleIllustrations()
     container.visibility = View.GONE
-  }
-
-  private fun textView(size: Float): TextView = TextView(context).apply {
-    setTextColor(Color.WHITE)
-    textSize = size
-    ViewCompat.setAccessibilityHeading(this, false)
-  }
-
-  private fun frameParams(gravity: Int, horizontalMargin: Int, verticalMargin: Int) = FrameLayout.LayoutParams(
-    FrameLayout.LayoutParams.WRAP_CONTENT,
-    FrameLayout.LayoutParams.WRAP_CONTENT,
-    gravity,
-  ).apply {
-    leftMargin = dp(horizontalMargin)
-    rightMargin = dp(horizontalMargin)
-    topMargin = dp(verticalMargin)
-    bottomMargin = dp(verticalMargin)
   }
 
   private fun dp(value: Int): Int = (value * context.resources.displayMetrics.density).toInt()
 
-  /** String resources used by one tutorial scene. */
-  private data class TutorialContent(val title: Int, val body: Int)
-
   private companion object {
-    const val STEP_EXIT_DURATION_MS = 130L
-    const val STEP_ENTER_DURATION_MS = 180L
-    const val STEP_TRANSITION_DISTANCE_DP = 10
+    const val ACTIVE_DOT_DIAMETER_DP = 8
+    const val DOT_DIAMETER_DP = 6
+    const val DOT_MARGIN_DP = 3
+    val INACTIVE_DOT: Int = Color.rgb(96, 96, 96)
+    val ORANGE: Int = Color.rgb(255, 152, 46)
   }
 }

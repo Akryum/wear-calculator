@@ -9,6 +9,7 @@ class TutorialStepTest {
   fun advancesThroughEachTutorialStep() {
     assertEquals(TutorialStep.DRAG_ACTION, TutorialStep.TAP_NUMBER.next())
     assertEquals(TutorialStep.CLEAR_INPUT, TutorialStep.DRAG_ACTION.next())
-    assertNull(TutorialStep.CLEAR_INPUT.next())
+    assertEquals(TutorialStep.SCROLL_HISTORY, TutorialStep.CLEAR_INPUT.next())
+    assertNull(TutorialStep.SCROLL_HISTORY.next())
   }
 }

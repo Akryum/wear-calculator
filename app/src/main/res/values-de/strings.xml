@@ -2,7 +2,7 @@
 <resources>
   <string name="app_name">Rechner für Uhr</string>
   <string name="launcher_name">Rechner</string>
-  <string name="tutorial_progress">Anleitung %1$d von %2$d</string>
+  <string name="tutorial_page_description">Anleitungsseite %1$d von %2$d</string>
   <string name="tutorial_tap_number_title">Zahlen antippen</string>
   <string name="tutorial_tap_number_body">Tippe am Rand auf eine Zahl.</string>
   <string name="tutorial_drag_action_title">Aktion wählen</string>
@@ -13,5 +13,16 @@
   <string name="tutorial_done">Fertig</string>
   <string name="tutorial_skip_description">Anleitung überspringen</string>
   <string name="tutorial_done_description">Anleitung beenden</string>
-  <string name="tutorial_next_description">Tippen, um mit der Anleitung fortzufahren</string>
+  <string name="tutorial_history_title">Berechnungen ansehen</string>
+  <string name="tutorial_history_body">Nach oben wischen für letzte Berechnungen und Einstellungen.</string>
+  <string name="history_title">Verlauf</string>
+  <string name="history_empty">Noch keine Berechnungen</string>
+  <string name="history_entry">%1$s = %2$s</string>
+  <string name="settings_title">Einstellungen</string>
+  <string name="haptics_enabled">Haptik</string>
+  <string name="show_tutorial">Anleitung zeigen</string>
+  <string name="clear_history">Verlauf löschen</string>
+  <string name="clear_history_title">Verlauf löschen?</string>
+  <string name="clear_history_message">Alle gespeicherten Berechnungen löschen?</string>
+  <string name="clear_history_confirm">Löschen</string>
 </resources>

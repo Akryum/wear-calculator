@@ -2,7 +2,7 @@
 <resources>
   <string name="app_name">時計用電卓</string>
   <string name="launcher_name">電卓</string>
-  <string name="tutorial_progress">チュートリアル %1$d / %2$d</string>
+  <string name="tutorial_page_description">チュートリアル %1$d / %2$d ページ</string>
   <string name="tutorial_tap_number_title">数字をタップ</string>
   <string name="tutorial_tap_number_body">外側にある数字をタップします。</string>
   <string name="tutorial_drag_action_title">操作を選ぶ</string>
@@ -13,5 +13,16 @@
   <string name="tutorial_done">完了</string>
   <string name="tutorial_skip_description">チュートリアルをスキップ</string>
   <string name="tutorial_done_description">チュートリアルを終了</string>
-  <string name="tutorial_next_description">タップしてチュートリアルを続ける</string>
+  <string name="tutorial_history_title">計算を確認</string>
+  <string name="tutorial_history_body">上にスワイプして履歴と設定を表示します。</string>
+  <string name="history_title">履歴</string>
+  <string name="history_empty">計算履歴はありません</string>
+  <string name="history_entry">%1$s = %2$s</string>
+  <string name="settings_title">設定</string>
+  <string name="haptics_enabled">触覚フィードバック</string>
+  <string name="show_tutorial">チュートリアルを表示</string>
+  <string name="clear_history">履歴を削除</string>
+  <string name="clear_history_title">履歴を削除しますか？</string>
+  <string name="clear_history_message">保存済みの計算をすべて削除しますか？</string>
+  <string name="clear_history_confirm">削除</string>
 </resources>
