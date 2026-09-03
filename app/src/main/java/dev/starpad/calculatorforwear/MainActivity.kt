@@ -5,7 +5,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
-import android.view.HapticFeedbackConstants
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
@@ -20,11 +19,10 @@ import androidx.core.view.setPadding
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.color.DynamicColors
 import dev.starpad.calculatorforwear.databinding.ActivityMainBinding
+import dev.starpad.calculatorforwear.haptics.CalculatorHaptics
+import dev.starpad.calculatorforwear.haptics.HapticCue
 import net.objecthunter.exp4j.ExpressionBuilder
 import java.time.Instant
-import java.util.Timer
-import kotlin.concurrent.schedule
-import java.util.TimerTask
 import kotlin.math.*
 
 class MainActivity : AppCompatActivity() {
@@ -32,8 +30,7 @@ class MainActivity : AppCompatActivity() {
   private lateinit var tutorialController: TutorialController
   private lateinit var historyStore: CalculationHistoryStore
   private lateinit var settingsStore: CalculatorSettingsStore
-
-  private var activity = this
+  private lateinit var haptics: CalculatorHaptics
 
   // Screen size
   private var screenWidth: Int = 0
@@ -64,8 +61,13 @@ class MainActivity : AppCompatActivity() {
   private var choice: String = ""
   private var previousChoiceView: View? = null
   private var choiceStartTime: Long = 0
-  private var longPressTimer: TimerTask? = null
   private val longPressDelay: Long = 800
+
+  /** Turns the backspace choice into a clear-all once the finger has rested on it long enough. */
+  private val armClearAll = Runnable {
+    (backspaceView as ImageView).setImageResource(R.drawable.ic_baseline_clear_24)
+    haptics.play(HapticCue.Threshold)
+  }
 
   // Animation
   private var shortAnimationDuration: Int = 0
@@ -86,6 +88,8 @@ class MainActivity : AppCompatActivity() {
 
     historyStore = CalculationHistoryStore(this)
     settingsStore = CalculatorSettingsStore(this)
+    // Feedback bubbles up to the window, so one view anchors the cues for the whole screen.
+    haptics = CalculatorHaptics(binding.root, settingsStore)
 
     mainTextLayout = findViewById(R.id.main_text_layout)
     centerMenuLayout = findViewById(R.id.center_menu_layout)
@@ -142,7 +146,7 @@ class MainActivity : AppCompatActivity() {
         currentInputTextView?.text = "${currentInputTextView?.text}$i"
         currentInputTextView?.alpha = 1f
         resultTextView?.alpha = 0f
-        haptic(button, HapticFeedbackConstants.CLOCK_TICK)
+        haptics.play(HapticCue.Tick)
       }
 
       digitBtnsLayout!!.addView(button)
@@ -158,6 +162,7 @@ class MainActivity : AppCompatActivity() {
     }
     binding.calculatorPage.setOnTouchListener { _, event -> handleCalculatorPageTouch(event) }
     binding.settingsButton.setOnClickListener {
+      haptics.play(HapticCue.Tick)
       startActivity(Intent(this, SettingsActivity::class.java))
     }
 
@@ -211,8 +216,11 @@ class MainActivity : AppCompatActivity() {
           equalView?.scaleY = 1.3f
           equalView?.alpha = 1f
           choice = "="
+          // Equal is already highlighted, so the first move only ticks once the finger leaves it.
+          previousChoiceView = equalView
           choiceStartTime = Instant.now().toEpochMilli()
           resetLongPressButtons()
+          haptics.play(HapticCue.GestureStart)
           Log.d("TOUCH", "Center menu active!")
         }
         true
@@ -254,16 +262,13 @@ class MainActivity : AppCompatActivity() {
           }
           if (previousChoiceView != view) {
             choiceStartTime = Instant.now().toEpochMilli()
+            haptics.play(HapticCue.Selection)
 
             // Reset long press buttons
-            longPressTimer?.cancel()
+            cancelLongPress()
             resetLongPressButtons()
             if (view == backspaceView) {
-              longPressTimer = Timer("longPressBackspace", false).schedule(longPressDelay) {
-                activity.runOnUiThread {
-                  (backspaceView as ImageView).setImageResource(R.drawable.ic_baseline_clear_24)
-                }
-              }
+              backspaceView?.postDelayed(armClearAll, longPressDelay)
             }
 
             if (previousChoiceView != null) {
@@ -280,13 +285,7 @@ class MainActivity : AppCompatActivity() {
       }
       MotionEvent.ACTION_UP -> {
         Log.d("TOUCH", "Action was UP: ${event.x};${event.y}")
-        centerMenuActive = false
-        mainTextLayout?.let { animateLayoutAlpha(it, 1f) }
-        digitBtnsLayout?.let { animateLayoutAlpha(it, 1f) }
-        centerMenuLayout?.let { animateLayoutAlpha(it, 0f) }
-        previousChoiceView?.scaleX = 1f
-        previousChoiceView?.scaleY = 1f
-        previousChoiceView?.alpha = 0.7f
+        closeCenterMenu()
 
         // Handle long press
         val now = Instant.now().toEpochMilli()
@@ -322,29 +321,39 @@ class MainActivity : AppCompatActivity() {
             currentInputTextView?.text = formattedResult
             historyStore.append(displayExpression, formattedResult)
             renderHistory()
-            haptic(binding.calculatorPage, HapticFeedbackConstants.CONFIRM)
+            haptics.play(HapticCue.Confirm)
           } catch (e: Exception) {
             Log.d("INPUT", "Input error ${e}")
+            // The expression is left untouched on screen, so the cue is the only sign of failure.
+            haptics.play(HapticCue.Reject)
           }
         } else if (choice == "backspace") {
           if (currentInputTextView?.text == resultTextView?.text || isLongPress) {
             val hadInput = !currentInputTextView?.text.isNullOrEmpty()
             currentInputTextView?.text = ""
             resultTextView?.alpha = 0.5f
-            if (hadInput) haptic(binding.calculatorPage, HapticFeedbackConstants.CONFIRM)
+            haptics.play(if (hadInput) HapticCue.Confirm else HapticCue.Reject)
           } else if (currentInputTextView?.text!!.isNotEmpty()) {
             resultTextView?.text = ""
             currentInputTextView?.text =
               currentInputTextView?.text?.substring(0, currentInputTextView?.text!!.length - 1)
-            haptic(binding.calculatorPage, HapticFeedbackConstants.CLOCK_TICK)
+            haptics.play(HapticCue.Tick)
+          } else {
+            haptics.play(HapticCue.Reject)
           }
         } else {
           currentInputTextView?.text = "${currentInputTextView?.text}$choice"
           currentInputTextView?.alpha = 1f
           resultTextView?.alpha = 0f
-          haptic(binding.calculatorPage, HapticFeedbackConstants.CLOCK_TICK)
+          haptics.play(HapticCue.Tick)
         }
 
+        true
+      }
+      // A notification or a pause steals the gesture: put the screen back without committing.
+      MotionEvent.ACTION_CANCEL -> {
+        Log.d("TOUCH", "Action was CANCEL")
+        closeCenterMenu()
         true
       }
       else -> false
@@ -365,6 +374,23 @@ class MainActivity : AppCompatActivity() {
 
   private fun resetLongPressButtons () {
     (backspaceView as ImageView).setImageResource(R.drawable.ic_baseline_backspace_24)
+  }
+
+  /** Drops a pending clear-all so it cannot arm after the finger moved on or left the screen. */
+  private fun cancelLongPress() {
+    backspaceView?.removeCallbacks(armClearAll)
+  }
+
+  /** Hides the radial menu and restores the calculator, without committing the current choice. */
+  private fun closeCenterMenu() {
+    centerMenuActive = false
+    cancelLongPress()
+    mainTextLayout?.let { animateLayoutAlpha(it, 1f) }
+    digitBtnsLayout?.let { animateLayoutAlpha(it, 1f) }
+    centerMenuLayout?.let { animateLayoutAlpha(it, 0f) }
+    previousChoiceView?.scaleX = 1f
+    previousChoiceView?.scaleY = 1f
+    previousChoiceView?.alpha = 0.7f
   }
 
   private fun renderHistory() {
@@ -393,9 +419,6 @@ class MainActivity : AppCompatActivity() {
     currentInputTextView?.alpha = 1f
     resultTextView?.alpha = 0f
     binding.calculatorScroll.post { binding.calculatorScroll.smoothScrollTo(0, 0) }
-  }
-
-  private fun haptic(view: View, feedback: Int) {
-    if (settingsStore.hapticsEnabled()) view.performHapticFeedback(feedback)
+    haptics.play(HapticCue.Confirm)
   }
 }

@@ -9,6 +9,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.wear.compose.foundation.rotary.RotaryScrollableDefaults
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumnItemScope
 import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
@@ -47,7 +48,16 @@ fun SettingsScreen(
 
   AppScaffold(modifier = modifier) {
     ScreenScaffold(scrollState = columnState) { contentPadding ->
-      TransformingLazyColumn(state = columnState, contentPadding = contentPadding) {
+      TransformingLazyColumn(
+        state = columnState,
+        contentPadding = contentPadding,
+        // Rotary feedback goes straight to the platform instead of through the Compose haptics
+        // local, so the preference has to be handed to it explicitly.
+        rotaryScrollableBehavior = RotaryScrollableDefaults.behavior(
+          scrollableState = columnState,
+          hapticFeedbackEnabled = hapticsEnabled,
+        ),
+      ) {
         item {
           ListHeader(
             modifier = Modifier.listItem(this@item, transformationSpec),
