@@ -97,14 +97,23 @@ fun SettingsScreen(
     }
   }
 
-  ClearHistoryDialog(
-    visible = confirmingClearHistory,
-    onConfirm = {
-      confirmingClearHistory = false
-      onClearHistory()
-    },
-    onDismiss = { confirmingClearHistory = false },
-  )
+  // The dialog runs a fair amount of setup even while hidden -- swipe-to-dismiss state, a
+  // Transition, a scaffold lookup -- and pulls in the largest class in the Material3 artifact.
+  // So it stays unmounted until first requested. It deliberately is not unmounted again on
+  // dismiss, because the dialog has to stay composed to play its exit animation.
+  var clearHistoryDialogMounted by rememberSaveable { mutableStateOf(false) }
+  if (confirmingClearHistory) clearHistoryDialogMounted = true
+
+  if (clearHistoryDialogMounted) {
+    ClearHistoryDialog(
+      visible = confirmingClearHistory,
+      onConfirm = {
+        confirmingClearHistory = false
+        onClearHistory()
+      },
+      onDismiss = { confirmingClearHistory = false },
+    )
+  }
 }
 
 /** Full-width item sized so the list can scale and morph it while scrolling. */
