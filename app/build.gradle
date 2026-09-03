@@ -17,9 +17,26 @@ android {
 
     }
 
+    signingConfigs {
+        // Falls back to the debug keystore so assembleRelease produces an installable
+        // APK out of the box. Drop a gitignored keystore.properties next to
+        // settings.gradle to sign with the real upload key instead.
+        release {
+            def props = new Properties()
+            def propsFile = rootProject.file('keystore.properties')
+            if (propsFile.exists()) { propsFile.withInputStream { props.load(it) } }
+            storeFile file(props.getProperty('storeFile',
+                    "${System.getProperty('user.home')}/.android/debug.keystore"))
+            storePassword props.getProperty('storePassword', 'android')
+            keyAlias      props.getProperty('keyAlias', 'androiddebugkey')
+            keyPassword   props.getProperty('keyPassword', 'android')
+        }
+    }
+
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
