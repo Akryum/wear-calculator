@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:versionCode="3">
     <uses-feature android:name="android.hardware.type.watch" />
 
@@ -35,6 +36,19 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- A calculator only ever renders digits and operators. EmojiCompat's font
+             metadata load cost 7.55% of total CPU at startup in a simpleperf trace,
+             so its App Startup initializer is removed from the merged manifest. -->
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+            <meta-data
+                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+                tools:node="remove" />
+        </provider>
     </application>
 
 </manifest>
