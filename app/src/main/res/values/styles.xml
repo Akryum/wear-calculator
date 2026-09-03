@@ -62,9 +62,13 @@
     <item name="android:textColor">@color/brand_orange</item>
   </style>
 
-  <!-- Settings runs on Wear Compose, so it only needs the platform window behavior the calculator uses. -->
+  <!--
+    Settings is pushed on top of the calculator, so it keeps the edge-swipe dismiss the platform
+    provides for a child activity. The calculator itself opts out of it (see Theme.MyApp) because
+    it is the root activity and its center menu tracks horizontal drags itself.
+  -->
   <style name="Theme.WearSettings" parent="@android:style/Theme.DeviceDefault">
-    <item name="android:windowSwipeToDismiss">false</item>
+    <item name="android:windowSwipeToDismiss">true</item>
     <item name="android:windowBackground">@android:color/black</item>
   </style>
 </resources>
