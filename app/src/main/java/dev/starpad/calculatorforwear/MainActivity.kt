@@ -21,6 +21,7 @@ import com.google.android.material.color.DynamicColors
 import dev.starpad.calculatorforwear.databinding.ActivityMainBinding
 import dev.starpad.calculatorforwear.haptics.CalculatorHaptics
 import dev.starpad.calculatorforwear.haptics.HapticCue
+import dev.starpad.calculatorforwear.menu.RadialChoice
 import net.objecthunter.exp4j.ExpressionBuilder
 import java.time.Instant
 import kotlin.math.*
@@ -47,25 +48,22 @@ class MainActivity : AppCompatActivity() {
   private var digitBtnsLayout: RelativeLayout? = null
 
   // Center menu
-  private var equalView: View? = null
-  private var addView: View? = null
-  private var subtractView: View? = null
-  private var multiplyView: View? = null
-  private var divideView: View? = null
-  private var backspaceView: View? = null
-  private var dotView: View? = null
-  private var powView: View? = null
-  private var percentView: View? = null
+  private val choiceViews = mutableMapOf<RadialChoice, View>()
   private var centerMenuActive: Boolean = false
   private var centerMenuLayout: RelativeLayout? = null
-  private var choice: String = ""
-  private var previousChoiceView: View? = null
+  private var choice: RadialChoice = RadialChoice.EQUALS
+  private var previousChoice: RadialChoice? = null
   private var choiceStartTime: Long = 0
   private val longPressDelay: Long = 800
 
+  /** The backspace glyph, the only one whose icon changes while the menu is open. */
+  private val backspaceIcon: ImageView?
+    get() = choiceViews[RadialChoice.BACKSPACE] as? ImageView
+
   /** Turns the backspace choice into a clear-all once the finger has rested on it long enough. */
   private val armClearAll = Runnable {
-    (backspaceView as ImageView).setImageResource(R.drawable.ic_baseline_clear_24)
+    backspaceIcon?.setImageResource(R.drawable.ic_baseline_clear_24)
+    binding.choiceLabel.text = getString(R.string.action_clear_all)
     haptics.play(HapticCue.Threshold)
   }
 
@@ -102,15 +100,7 @@ class MainActivity : AppCompatActivity() {
     screenHeight = resources.displayMetrics.heightPixels
 
     // Central menu
-    equalView = findViewById(R.id.txt_equal)
-    addView = findViewById(R.id.txt_add)
-    subtractView = findViewById(R.id.txt_subtract)
-    multiplyView = findViewById(R.id.txt_multiply)
-    divideView = findViewById(R.id.txt_divide)
-    backspaceView = findViewById(R.id.img_backspace)
-    dotView = findViewById(R.id.txt_dot)
-    powView = findViewById(R.id.txt_pow)
-    percentView = findViewById(R.id.txt_percent)
+    RadialChoice.entries.forEach { choiceViews[it] = findViewById(it.viewId) }
 
     // Button size
     digitBtnWidth = screenWidth / 384 * 90
@@ -212,12 +202,15 @@ class MainActivity : AppCompatActivity() {
           mainTextLayout?.let { animateLayoutAlpha(it, 0f) }
           digitBtnsLayout?.let { animateLayoutAlpha(it, 0f) }
           centerMenuLayout?.let { animateLayoutAlpha(it, 1f) }
-          equalView?.scaleX = 1.3f
-          equalView?.scaleY = 1.3f
-          equalView?.alpha = 1f
-          choice = "="
+          choice = RadialChoice.EQUALS
+          choiceViews[choice]?.apply {
+            scaleX = 1.3f
+            scaleY = 1.3f
+            alpha = 1f
+          }
+          updateChoiceLabel()
           // Equal is already highlighted, so the first move only ticks once the finger leaves it.
-          previousChoiceView = equalView
+          previousChoice = choice
           choiceStartTime = Instant.now().toEpochMilli()
           resetLongPressButtons()
           haptics.play(HapticCue.GestureStart)
@@ -231,55 +224,24 @@ class MainActivity : AppCompatActivity() {
           val dY = event.y - screenHeight / 2
           val distance = sqrt(dX.pow(2) + dY.pow(2))
           val angle = atan2(dY, dX)
-          val view: View?
-          if (distance <= 36) {
-            choice = "="
-            view = equalView
-          } else if (angle >= - PI * 1 / 8 && angle <= PI / 8) {
-            choice = "×"
-            view = multiplyView
-          } else if (angle >= PI / 8 && angle <= PI * 3 / 8) {
-            choice = "."
-            view = dotView
-          } else if (angle >= PI * 3 / 8 && angle <= PI * 5 / 8) {
-            choice = "+"
-            view = addView
-          } else if (angle >= PI * 5 / 8 && angle <= PI * 7 / 8) {
-            choice = "%"
-            view = percentView
-          } else if (angle >= PI * 7 / 8 || angle <= - PI * 7 / 8) {
-            choice = "÷"
-            view = divideView
-          } else if (angle >= - PI * 7 / 8 && angle <= - PI * 5 / 8) {
-            choice = "backspace"
-            view = backspaceView
-          } else if (angle >= - PI * 3 / 8  && angle <= - PI * 1 / 8) {
-            choice = "^"
-            view = powView
-          } else {
-            choice = "-"
-            view = subtractView
-          }
-          if (previousChoiceView != view) {
+          choice = RadialChoice.at(distance, angle)
+          if (previousChoice != choice) {
             choiceStartTime = Instant.now().toEpochMilli()
             haptics.play(HapticCue.Selection)
+            updateChoiceLabel()
 
             // Reset long press buttons
             cancelLongPress()
             resetLongPressButtons()
-            if (view == backspaceView) {
-              backspaceView?.postDelayed(armClearAll, longPressDelay)
+            if (choice == RadialChoice.BACKSPACE) {
+              backspaceIcon?.postDelayed(armClearAll, longPressDelay)
             }
 
-            if (previousChoiceView != null) {
-              animateViewSize(previousChoiceView!!, 1f)
-            }
-            if (view != null) {
-              animateViewSize(view, 1.3f)
-            }
-            previousChoiceView = view
+            previousChoice?.let { choiceViews[it] }?.let { animateViewSize(it, 1f) }
+            choiceViews[choice]?.let { animateViewSize(it, 1.3f) }
+            previousChoice = choice
           }
-          Log.d("TOUCH", "Action was MOVE: ${event.x};${event.y} angle:${angle} distance:${distance} => ${choice} ${view}")
+          Log.d("TOUCH", "Action was MOVE: ${event.x};${event.y} => ${choice}")
         }
         true
       }
@@ -291,7 +253,7 @@ class MainActivity : AppCompatActivity() {
         val now = Instant.now().toEpochMilli()
         val isLongPress = now - choiceStartTime > longPressDelay
 
-        if (choice == "=") {
+        if (choice == RadialChoice.EQUALS) {
           try {
             val displayExpression = currentInputTextView!!.text.toString()
             var input = displayExpression
@@ -327,7 +289,7 @@ class MainActivity : AppCompatActivity() {
             // The expression is left untouched on screen, so the cue is the only sign of failure.
             haptics.play(HapticCue.Reject)
           }
-        } else if (choice == "backspace") {
+        } else if (choice == RadialChoice.BACKSPACE) {
           if (currentInputTextView?.text == resultTextView?.text || isLongPress) {
             val hadInput = !currentInputTextView?.text.isNullOrEmpty()
             currentInputTextView?.text = ""
@@ -342,7 +304,7 @@ class MainActivity : AppCompatActivity() {
             haptics.play(HapticCue.Reject)
           }
         } else {
-          currentInputTextView?.text = "${currentInputTextView?.text}$choice"
+          currentInputTextView?.text = "${currentInputTextView?.text}${choice.symbol}"
           currentInputTextView?.alpha = 1f
           resultTextView?.alpha = 0f
           haptics.play(HapticCue.Tick)
@@ -373,12 +335,17 @@ class MainActivity : AppCompatActivity() {
   }
 
   private fun resetLongPressButtons () {
-    (backspaceView as ImageView).setImageResource(R.drawable.ic_baseline_backspace_24)
+    backspaceIcon?.setImageResource(R.drawable.ic_baseline_backspace_24)
   }
 
   /** Drops a pending clear-all so it cannot arm after the finger moved on or left the screen. */
   private fun cancelLongPress() {
-    backspaceView?.removeCallbacks(armClearAll)
+    backspaceIcon?.removeCallbacks(armClearAll)
+  }
+
+  /** Names the hovered action on the bezel, where the dragging finger cannot hide it. */
+  private fun updateChoiceLabel() {
+    binding.choiceLabel.text = getString(choice.labelRes)
   }
 
   /** Hides the radial menu and restores the calculator, without committing the current choice. */
@@ -388,9 +355,12 @@ class MainActivity : AppCompatActivity() {
     mainTextLayout?.let { animateLayoutAlpha(it, 1f) }
     digitBtnsLayout?.let { animateLayoutAlpha(it, 1f) }
     centerMenuLayout?.let { animateLayoutAlpha(it, 0f) }
-    previousChoiceView?.scaleX = 1f
-    previousChoiceView?.scaleY = 1f
-    previousChoiceView?.alpha = 0.7f
+    previousChoice?.let { choiceViews[it] }?.apply {
+      scaleX = 1f
+      scaleY = 1f
+      alpha = 0.7f
+    }
+    previousChoice = null
   }
 
   private fun renderHistory() {

@@ -34,4 +34,16 @@
     <string name="operator_decimal" translatable="false">.</string>
     <string name="operator_power" translatable="false">^</string>
     <string name="operator_percent" translatable="false">%</string>
+
+    <!-- Names of the radial menu actions, shown on the bezel while the finger hovers one. -->
+    <string name="action_add">Add</string>
+    <string name="action_subtract">Subtract</string>
+    <string name="action_multiply">Multiply</string>
+    <string name="action_divide">Divide</string>
+    <string name="action_equals">Equals</string>
+    <string name="action_decimal">Decimal</string>
+    <string name="action_power">Power</string>
+    <string name="action_percent">Percent</string>
+    <string name="action_backspace">Delete</string>
+    <string name="action_clear_all">Clear all</string>
 </resources>

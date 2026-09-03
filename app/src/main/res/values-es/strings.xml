@@ -25,4 +25,16 @@
   <string name="clear_history_title">¿Borrar historial?</string>
   <string name="clear_history_message">¿Eliminar todos los cálculos guardados?</string>
   <string name="clear_history_confirm">Borrar</string>
+
+  <!-- Names of the radial menu actions, shown on the bezel while the finger hovers one. -->
+  <string name="action_add">Sumar</string>
+  <string name="action_subtract">Restar</string>
+  <string name="action_multiply">Multiplicar</string>
+  <string name="action_divide">Dividir</string>
+  <string name="action_equals">Igual</string>
+  <string name="action_decimal">Decimal</string>
+  <string name="action_power">Potencia</string>
+  <string name="action_percent">Porcentaje</string>
+  <string name="action_backspace">Borrar</string>
+  <string name="action_clear_all">Borrar todo</string>
 </resources>

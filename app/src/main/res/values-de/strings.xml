@@ -25,4 +25,16 @@
   <string name="clear_history_title">Verlauf löschen?</string>
   <string name="clear_history_message">Alle gespeicherten Berechnungen löschen?</string>
   <string name="clear_history_confirm">Löschen</string>
+
+  <!-- Names of the radial menu actions, shown on the bezel while the finger hovers one. -->
+  <string name="action_add">Addieren</string>
+  <string name="action_subtract">Subtrahieren</string>
+  <string name="action_multiply">Multiplizieren</string>
+  <string name="action_divide">Dividieren</string>
+  <string name="action_equals">Gleich</string>
+  <string name="action_decimal">Komma</string>
+  <string name="action_power">Potenz</string>
+  <string name="action_percent">Prozent</string>
+  <string name="action_backspace">Löschen</string>
+  <string name="action_clear_all">Alles löschen</string>
 </resources>

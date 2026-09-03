@@ -25,4 +25,16 @@
   <string name="clear_history_title">履歴を削除しますか？</string>
   <string name="clear_history_message">保存済みの計算をすべて削除しますか？</string>
   <string name="clear_history_confirm">削除</string>
+
+  <!-- Names of the radial menu actions, shown on the bezel while the finger hovers one. -->
+  <string name="action_add">たす</string>
+  <string name="action_subtract">ひく</string>
+  <string name="action_multiply">かける</string>
+  <string name="action_divide">わる</string>
+  <string name="action_equals">イコール</string>
+  <string name="action_decimal">小数点</string>
+  <string name="action_power">べき乗</string>
+  <string name="action_percent">パーセント</string>
+  <string name="action_backspace">削除</string>
+  <string name="action_clear_all">すべて消去</string>
 </resources>

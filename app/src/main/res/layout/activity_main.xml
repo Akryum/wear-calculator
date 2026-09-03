@@ -177,6 +177,25 @@
                 android:textColor="?attr/colorOnSurface"
                 android:textSize="24sp" />
           </RelativeLayout>
+
+          <!--
+            Names the hovered action on the top bezel: the glyphs are terse and the finger covers
+            them mid-drag. It lives inside the menu so it fades in and out with it, and sits at
+            the top because the finger enters the gesture from the bottom of the watch.
+          -->
+          <androidx.wear.widget.CurvedTextView
+              android:id="@+id/choice_label"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:ellipsize="end"
+              android:fontFamily="sans-serif-medium"
+              android:importantForAccessibility="no"
+              android:padding="8dp"
+              android:textColor="?attr/colorOnSurface"
+              android:textSize="13sp"
+              app:anchorAngleDegrees="0"
+              app:anchorPosition="center"
+              app:maxSweepDegrees="150" />
         </RelativeLayout>
       </androidx.wear.widget.BoxInsetLayout>
 
