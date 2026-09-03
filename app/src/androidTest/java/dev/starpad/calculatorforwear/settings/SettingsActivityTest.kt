@@ -11,11 +11,12 @@ import dev.starpad.calculatorforwear.R
 import dev.starpad.calculatorforwear.SettingsActivity
 import org.junit.After
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-/** Verifies the activity persists what the settings screen reports. */
+/** Verifies the activity hosts the settings screen correctly and persists what it reports. */
 @RunWith(AndroidJUnit4::class)
 class SettingsActivityTest {
   @get:Rule
@@ -27,6 +28,19 @@ class SettingsActivityTest {
   @After
   fun restoreHaptics() {
     settingsStore.setHapticsEnabled(true)
+  }
+
+  @Test
+  fun activityThemeEnablesSwipeToDismiss() {
+    val attributes = composeRule.activity.theme
+      .obtainStyledAttributes(intArrayOf(android.R.attr.windowSwipeToDismiss))
+    val swipeToDismissEnabled = try {
+      attributes.getBoolean(0, false)
+    } finally {
+      attributes.recycle()
+    }
+
+    assertTrue(swipeToDismissEnabled)
   }
 
   @Test
