@@ -14,3 +14,6 @@
 .cxx
 local.properties
 /app/release
+
+# Release signing credentials (falls back to the debug keystore when absent)
+keystore.properties

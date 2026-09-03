@@ -40,6 +40,16 @@ android {
             signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+
+        // Release code and release compilation, but profileable by shell so simpleperf
+        // and the Studio profiler can attach. Measure performance with this variant --
+        // never with debug, which ART refuses to AOT-compile past the verify filter.
+        benchmark {
+            initWith buildTypes.release
+            signingConfig signingConfigs.release
+            matchingFallbacks = ['release']
+            profileable true
+        }
     }
     buildFeatures {
         viewBinding = true

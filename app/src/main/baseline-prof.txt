@@ -1,0 +1,8 @@
+# App-side baseline profile. The Compose and Wear Material3 hot paths are already
+# covered by the profiles those AARs ship, which AGP merges into
+# assets/dexopt/baseline.prof; these rules add this app's own classes on top.
+HSPLdev/starpad/calculatorforwear/SettingsActivity;->**(**)**
+HSPLdev/starpad/calculatorforwear/settings/**->**(**)**
+HSPLdev/starpad/calculatorforwear/CalculatorSettingsStore;->**(**)**
+HSPLdev/starpad/calculatorforwear/CalculationHistoryStore;->**(**)**
+Ldev/starpad/calculatorforwear/settings/**
