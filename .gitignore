@@ -17,3 +17,7 @@ local.properties
 
 # Release signing credentials (falls back to the debug keystore when absent)
 keystore.properties
+
+# Play upload certificate and Kotlin compiler session data
+upload_certificate.pem
+.kotlin/

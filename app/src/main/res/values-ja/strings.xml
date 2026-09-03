@@ -2,7 +2,6 @@
 <resources>
   <string name="app_name">時計用電卓</string>
   <string name="launcher_name">電卓</string>
-  <string name="tutorial_page_description">チュートリアル %1$d / %2$d ページ</string>
   <string name="tutorial_tap_number_title">数字をタップ</string>
   <string name="tutorial_tap_number_body">外側にある数字をタップします。</string>
   <string name="tutorial_drag_action_title">操作を選ぶ</string>

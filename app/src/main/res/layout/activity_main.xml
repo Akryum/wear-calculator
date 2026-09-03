@@ -59,6 +59,13 @@
             android:alpha="0"
             android:clickable="false">
 
+          <!-- Fills up around backspace while the finger rests on it, until clear-all arms. -->
+          <dev.starpad.calculatorforwear.menu.HoldProgressView
+              android:id="@+id/hold_progress"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:importantForAccessibility="no" />
+
           <!--
             The wrapper stays: it is measured as wrap_content around the glyphs, which are placed
             relative to its edges, so flattening it into the parent would move them. Left/right

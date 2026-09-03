@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-  <item name="tutorial_carousel" type="id" />
-  <item name="tutorial_page_indicator" type="id" />
-  <item name="tutorial_title" type="id" />
-  <item name="tutorial_body" type="id" />
-  <item name="tutorial_action_button" type="id" />
-</resources>

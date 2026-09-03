@@ -2,7 +2,6 @@
 <resources>
   <string name="app_name">Calculadora para Reloj</string>
   <string name="launcher_name">Calculadora</string>
-  <string name="tutorial_page_description">Página %1$d de %2$d del tutorial</string>
   <string name="tutorial_tap_number_title">Toca números</string>
   <string name="tutorial_tap_number_body">Toca cualquier número del borde.</string>
   <string name="tutorial_drag_action_title">Elige una acción</string>

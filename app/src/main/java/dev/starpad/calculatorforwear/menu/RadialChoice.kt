@@ -16,8 +16,8 @@ import kotlin.math.PI
  */
 enum class RadialChoice(
   val symbol: String,
-  @IdRes val viewId: Int,
-  @StringRes val labelRes: Int,
+  @param:IdRes val viewId: Int,
+  @param:StringRes val labelRes: Int,
 ) {
   EQUALS("=", R.id.txt_equal, R.string.action_equals),
   ADD("+", R.id.txt_add, R.string.action_add),

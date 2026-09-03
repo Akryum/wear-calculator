@@ -1,25 +1,36 @@
 package dev.starpad.calculatorforwear
 
 import android.content.Context
-import android.os.SystemClock
 import android.view.View
-import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.recyclerview.widget.RecyclerView
+import androidx.annotation.StringRes
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.junit4.createEmptyComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performRotaryScrollInput
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipeLeft
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.android.material.button.MaterialButton
+import dev.starpad.calculatorforwear.tutorial.TUTORIAL_PAGER_TAG
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class TutorialActivityTest {
+  // Empty rule: each test launches the activity itself, after the stored progress is set up.
+  @get:Rule
+  val compose = createEmptyComposeRule()
+
   @Before
   fun clearTutorialProgress() {
     preferences().edit().clear().commit()
@@ -46,36 +57,18 @@ class TutorialActivityTest {
   }
 
   @Test
-  fun carouselSelectsPageUpdatesDotsAndPreservesCalculatorInput() {
+  fun swipingSelectsPageSavesProgressAndPreservesCalculatorInput() {
     ActivityScenario.launch(MainActivity::class.java).use { scenario ->
       scenario.onActivity { activity ->
-        val carousel = activity.findViewById<RecyclerView>(R.id.tutorial_carousel)
-        val indicator = activity.findViewById<LinearLayout>(R.id.tutorial_page_indicator)
-
         assertEquals(View.VISIBLE, activity.findViewById<View>(R.id.tutorial_container).visibility)
-        assertEquals(TutorialStep.entries.size, indicator.childCount)
-        assertTrue(indicator.getChildAt(TutorialStep.TAP_NUMBER.ordinal).isSelected)
-        assertTrue(carousel.canScrollHorizontally(1))
-        carousel.smoothScrollToPosition(TutorialStep.CLEAR_INPUT.ordinal)
       }
-      waitForCarousel()
-      scenario.onActivity { activity ->
-        val indicator = activity.findViewById<LinearLayout>(R.id.tutorial_page_indicator)
-        val page = pageFor(activity, TutorialStep.CLEAR_INPUT)
+      compose.onNodeWithText(string(R.string.tutorial_tap_number_title)).assertIsDisplayed()
 
-        assertEquals(
-          activity.getString(R.string.tutorial_clear_input_title),
-          page.findViewById<TextView>(R.id.tutorial_title).text,
-        )
-        assertTrue(indicator.getChildAt(TutorialStep.CLEAR_INPUT.ordinal).isSelected)
-        assertEquals(
-          activity.getString(
-            R.string.tutorial_page_description,
-            TutorialStep.CLEAR_INPUT.ordinal + 1,
-            TutorialStep.entries.size,
-          ),
-          indicator.contentDescription,
-        )
+      swipeToNextPage()
+      swipeToNextPage()
+
+      compose.onNodeWithText(string(R.string.tutorial_clear_input_title)).assertIsDisplayed()
+      scenario.onActivity { activity ->
         assertTrue(activity.findViewById<TextView>(R.id.txt_input).text.isEmpty())
       }
     }
@@ -87,37 +80,22 @@ class TutorialActivityTest {
   }
 
   @Test
-  fun carouselRestoreShowsPersistedPageAfterActivityRecreation() {
-    ActivityScenario.launch(MainActivity::class.java).use { scenario ->
-      scenario.onActivity { activity ->
-        activity.findViewById<RecyclerView>(R.id.tutorial_carousel)
-          .smoothScrollToPosition(TutorialStep.DRAG_ACTION.ordinal)
-      }
-      waitForCarousel()
+  fun tutorialReopensOnPersistedPageAfterActivityRecreation() {
+    ActivityScenario.launch(MainActivity::class.java).use {
+      swipeToNextPage()
     }
 
-    ActivityScenario.launch(MainActivity::class.java).use { scenario ->
-      waitForCarousel()
-      scenario.onActivity { activity ->
-        val page = pageFor(activity, TutorialStep.DRAG_ACTION)
-
-        assertEquals(
-          activity.getString(R.string.tutorial_drag_action_title),
-          page.findViewById<TextView>(R.id.tutorial_title).text,
-        )
-      }
+    ActivityScenario.launch(MainActivity::class.java).use {
+      compose.onNodeWithText(string(R.string.tutorial_drag_action_title)).assertIsDisplayed()
     }
   }
 
   @Test
   fun skipAndDoneHideTutorialAndMarkComplete() {
     ActivityScenario.launch(MainActivity::class.java).use { scenario ->
+      compose.onNodeWithText(string(R.string.tutorial_skip)).performClick()
+      compose.waitForIdle()
       scenario.onActivity { activity ->
-        val firstPage = pageFor(activity, TutorialStep.TAP_NUMBER)
-        val action = firstPage.findViewById<MaterialButton>(R.id.tutorial_action_button)
-
-        assertEquals(activity.getString(R.string.tutorial_skip), action.text)
-        action.performClick()
         assertEquals(View.GONE, activity.findViewById<View>(R.id.tutorial_container).visibility)
       }
     }
@@ -125,17 +103,10 @@ class TutorialActivityTest {
 
     preferences().edit().clear().commit()
     ActivityScenario.launch(MainActivity::class.java).use { scenario ->
+      repeat(TutorialStep.entries.size - 1) { swipeToNextPage() }
+      compose.onNodeWithText(string(R.string.tutorial_done)).performClick()
+      compose.waitForIdle()
       scenario.onActivity { activity ->
-        activity.findViewById<RecyclerView>(R.id.tutorial_carousel)
-          .smoothScrollToPosition(TutorialStep.SCROLL_HISTORY.ordinal)
-      }
-      waitForCarousel()
-      scenario.onActivity { activity ->
-        val finalPage = pageFor(activity, TutorialStep.SCROLL_HISTORY)
-        val action = finalPage.findViewById<MaterialButton>(R.id.tutorial_action_button)
-
-        assertEquals(activity.getString(R.string.tutorial_done), action.text)
-        action.performClick()
         assertEquals(View.GONE, activity.findViewById<View>(R.id.tutorial_container).visibility)
       }
     }
@@ -150,14 +121,10 @@ class TutorialActivityTest {
     TutorialReplay.request(context)
 
     ActivityScenario.launch(MainActivity::class.java).use { scenario ->
-      waitForCarousel()
       scenario.onActivity { activity ->
         assertEquals(View.VISIBLE, activity.findViewById<View>(R.id.tutorial_container).visibility)
-        assertEquals(
-          activity.getString(R.string.tutorial_tap_number_title),
-          pageFor(activity, TutorialStep.TAP_NUMBER).findViewById<TextView>(R.id.tutorial_title).text,
-        )
       }
+      compose.onNodeWithText(string(R.string.tutorial_tap_number_title)).assertIsDisplayed()
     }
 
     ActivityScenario.launch(MainActivity::class.java).use { scenario ->
@@ -167,19 +134,35 @@ class TutorialActivityTest {
     }
   }
 
-  private fun pageFor(activity: MainActivity, step: TutorialStep): View {
-    val carousel = activity.findViewById<RecyclerView>(R.id.tutorial_carousel)
-    return requireNotNull(carousel.findViewHolderForAdapterPosition(step.ordinal)).itemView
+  @Test
+  fun rotaryTurnSnapsToNextPageAndSavesProgress() {
+    ActivityScenario.launch(MainActivity::class.java).use {
+      compose.onNodeWithTag(TUTORIAL_PAGER_TAG).performRotaryScrollInput {
+        rotateToScrollVertically(ROTARY_DETENT_PX)
+      }
+      compose.waitForIdle()
+
+      compose.onNodeWithText(string(R.string.tutorial_drag_action_title)).assertIsDisplayed()
+    }
+
+    assertEquals(
+      TutorialStep.DRAG_ACTION,
+      TutorialProgressStore(ApplicationProvider.getApplicationContext()).currentStep(),
+    )
   }
 
-  private fun waitForCarousel() {
-    SystemClock.sleep(CAROUSEL_SETTLE_WAIT_MS)
+  private fun swipeToNextPage() {
+    compose.onNodeWithTag(TUTORIAL_PAGER_TAG).performTouchInput { swipeLeft() }
+    compose.waitForIdle()
   }
+
+  private fun string(@StringRes id: Int): String = ApplicationProvider.getApplicationContext<Context>().getString(id)
 
   private fun preferences() = ApplicationProvider.getApplicationContext<Context>()
     .getSharedPreferences(TutorialProgressStore.PREFERENCES_NAME, Context.MODE_PRIVATE)
 
   private companion object {
-    const val CAROUSEL_SETTLE_WAIT_MS = 700L
+    /** About one bezel detent, enough for the pager's snap behaviour to turn one page. */
+    const val ROTARY_DETENT_PX = 200f
   }
 }

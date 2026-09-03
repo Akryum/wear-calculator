@@ -3,45 +3,64 @@ package dev.starpad.calculatorforwear
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.Path
-import android.graphics.Typeface
 import android.util.AttributeSet
 import android.view.View
 import android.view.animation.LinearInterpolator
-import kotlin.math.PI
-import kotlin.math.cos
+import androidx.core.graphics.withClip
+import dev.starpad.calculatorforwear.tutorial.ChooseActionScene
+import dev.starpad.calculatorforwear.tutorial.ClearInputScene
+import dev.starpad.calculatorforwear.tutorial.DigitTapScene
+import dev.starpad.calculatorforwear.tutorial.HistoryScrollScene
+import dev.starpad.calculatorforwear.tutorial.SceneFrame
+import dev.starpad.calculatorforwear.tutorial.ScenePainter
+import dev.starpad.calculatorforwear.tutorial.TutorialScene
 import kotlin.math.min
-import kotlin.math.sin
 
-/** Decorative, looping visual explanation for one calculator gesture. */
+/**
+ * Decorative, looping visual explanation for one calculator gesture. It animates only while it
+ * is [active], attached and in a visible window, and freezes where it is otherwise.
+ */
 class TutorialIllustrationView @JvmOverloads constructor(
   context: Context,
   attrs: AttributeSet? = null,
 ) : View(context, attrs) {
-  private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
-  private var step = TutorialStep.TAP_NUMBER
+  private val painter = ScenePainter(context)
+  private var scene: TutorialScene = DigitTapScene
   private var phase = 0f
   private var animator: ValueAnimator? = null
 
-  /** Shows specified gesture and restarts its loop. */
-  fun showStep(value: TutorialStep) {
-    step = value
-    phase = 0f
-    restartAnimation()
-    invalidate()
-  }
+  /** Drawing area for the current size, rebuilt on layout rather than on every frame. */
+  private var frame: SceneFrame? = null
 
-  /** Stops animation while activity is not visible. */
-  fun pauseAnimation() {
-    animator?.cancel()
-    animator = null
-  }
+  /** Gesture shown; changing it restarts the loop from the beginning. */
+  var step: TutorialStep = TutorialStep.TAP_NUMBER
+    set(value) {
+      if (field == value) return
+      field = value
+      scene = when (value) {
+        TutorialStep.TAP_NUMBER -> DigitTapScene
+        TutorialStep.DRAG_ACTION -> ChooseActionScene
+        TutorialStep.CLEAR_INPUT -> ClearInputScene
+        TutorialStep.SCROLL_HISTORY -> HistoryScrollScene
+      }
+      phase = 0f
+      if (animator != null) {
+        pauseAnimation()
+        resumeAnimation()
+      }
+      invalidate()
+    }
 
-  /** Restarts animation after activity returns to foreground. */
-  fun resumeAnimation() {
-    restartAnimation()
+  /** Whether this page is the one on screen; only the active page animates. */
+  var active: Boolean = false
+    set(value) {
+      field = value
+      syncAnimation()
+    }
+
+  override fun onAttachedToWindow() {
+    super.onAttachedToWindow()
+    syncAnimation()
   }
 
   override fun onDetachedFromWindow() {
@@ -49,26 +68,46 @@ class TutorialIllustrationView @JvmOverloads constructor(
     super.onDetachedFromWindow()
   }
 
+  override fun onWindowVisibilityChanged(visibility: Int) {
+    super.onWindowVisibilityChanged(visibility)
+    syncAnimation()
+  }
+
+  override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
+    super.onSizeChanged(w, h, oldw, oldh)
+    val innerWidth = (w - paddingLeft - paddingRight).toFloat()
+    val innerHeight = (h - paddingTop - paddingBottom).toFloat()
+    // The padded area stands for the whole watch face, scaled to the largest circle that fits.
+    frame = if (innerWidth <= 0f || innerHeight <= 0f) null else SceneFrame(
+      centerX = paddingLeft + innerWidth / 2,
+      centerY = paddingTop + innerHeight / 2,
+      radius = min(innerWidth, innerHeight) / 2,
+    )
+  }
+
   override fun onDraw(canvas: Canvas) {
     super.onDraw(canvas)
-    val centerX = width / 2f
-    val centerY = height * 0.32f
-    val radius = min(width, height) * 0.19f
-
-    when (step) {
-      TutorialStep.TAP_NUMBER -> drawNumberTap(canvas, centerX, centerY, radius)
-      TutorialStep.DRAG_ACTION -> drawActionDrag(canvas, centerX, centerY, radius)
-      TutorialStep.CLEAR_INPUT -> drawClearGesture(canvas, centerX, centerY, radius)
-      TutorialStep.SCROLL_HISTORY -> drawHistoryScroll(canvas, centerX, centerY, radius)
+    val frame = frame ?: return
+    val shownPhase = if (ValueAnimator.areAnimatorsEnabled()) phase else scene.previewPhase
+    canvas.withClip(paddingLeft, paddingTop, width - paddingRight, height - paddingBottom) {
+      scene.draw(this, painter, frame, shownPhase)
     }
   }
 
-  private fun restartAnimation() {
-    pauseAnimation()
-    if (!ValueAnimator.areAnimatorsEnabled() || !isAttachedToWindow) return
+  /** Runs the loop only while it can be seen, continuing from where it was frozen. */
+  private fun syncAnimation() {
+    if (active && isAttachedToWindow && windowVisibility == VISIBLE) resumeAnimation() else pauseAnimation()
+  }
 
+  private fun pauseAnimation() {
+    animator?.cancel()
+    animator = null
+  }
+
+  private fun resumeAnimation() {
+    if (animator != null || !ValueAnimator.areAnimatorsEnabled()) return
     animator = ValueAnimator.ofFloat(0f, 1f).apply {
-      duration = LOOP_DURATION_MS
+      duration = scene.durationMs
       repeatCount = ValueAnimator.INFINITE
       interpolator = LinearInterpolator()
       addUpdateListener {
@@ -76,118 +115,7 @@ class TutorialIllustrationView @JvmOverloads constructor(
         invalidate()
       }
       start()
+      setCurrentFraction(phase)
     }
-  }
-
-  private fun drawNumberTap(canvas: Canvas, x: Float, y: Float, radius: Float) {
-    val selectedIndex = 1
-    val pulse = if (phase < 0.45f) 1f + phase * 0.25f else 1.12f - (phase - 0.45f) * 0.22f
-    val ringRadius = radius * 0.76f
-    val buttonRadius = radius * 0.22f
-
-    repeat(8) { index ->
-      val angle = (PI * 2 * index / 8 - PI / 2).toFloat()
-      val buttonX = x + cos(angle.toDouble()).toFloat() * ringRadius
-      val buttonY = y + sin(angle.toDouble()).toFloat() * ringRadius
-      val selected = index == selectedIndex
-      drawCircle(canvas, buttonX, buttonY, buttonRadius * if (selected) pulse else 1f, selected)
-      drawLabel(canvas, ((index + 1) % 10).toString(), buttonX, buttonY + buttonRadius * 0.32f, buttonRadius * 0.9f, Color.WHITE)
-    }
-
-    val angle = (PI * 2 * selectedIndex / 8 - PI / 2).toFloat()
-    val targetX = x + cos(angle.toDouble()).toFloat() * ringRadius
-    val targetY = y + sin(angle.toDouble()).toFloat() * ringRadius
-    val fingerProgress = min(phase / 0.45f, 1f)
-    drawFinger(canvas, targetX, targetY + radius * 0.52f * (1f - fingerProgress), buttonRadius * 0.35f, fingerProgress)
-  }
-
-  private fun drawActionDrag(canvas: Canvas, x: Float, y: Float, radius: Float) {
-    val targetY = y - radius * 0.7f
-    val dragProgress = ((phase - 0.25f) / 0.55f).coerceIn(0f, 1f)
-    val fingerY = y + radius * 0.45f * (1f - min(phase / 0.25f, 1f)) - (y - targetY) * dragProgress
-    val selectorVisible = phase > 0.2f
-
-    drawCircle(canvas, x, y, radius * if (phase < 0.25f) 0.38f else 0.5f, selectorVisible)
-    drawLabel(canvas, "=", x, y + radius * 0.17f, radius * 0.55f, Color.WHITE)
-    drawCircle(canvas, x, targetY, radius * 0.3f, dragProgress > 0.65f)
-    drawLabel(canvas, "+", x, targetY + radius * 0.13f, radius * 0.52f, Color.WHITE)
-
-    paint.color = ORANGE
-    paint.style = Paint.Style.STROKE
-    paint.strokeWidth = radius * 0.07f
-    paint.strokeCap = Paint.Cap.ROUND
-    canvas.drawPath(Path().apply {
-      moveTo(x, y - radius * 0.45f)
-      lineTo(x, targetY + radius * 0.36f)
-    }, paint)
-    drawFinger(canvas, x, fingerY, radius * 0.24f, 1f)
-  }
-
-  private fun drawClearGesture(canvas: Canvas, x: Float, y: Float, radius: Float) {
-    val targetX = x - radius * 1.05f
-    val targetY = y - radius * 0.65f
-    val dragProgress = ((phase - 0.18f) / 0.4f).coerceIn(0f, 1f)
-    val holding = phase > 0.63f
-    val fingerX = x - (x - targetX) * dragProgress
-    val fingerY = y - (y - targetY) * dragProgress
-
-    drawCircle(canvas, x, y, radius * 0.43f, false)
-    drawLabel(canvas, "=", x, y + radius * 0.16f, radius * 0.52f, Color.WHITE)
-    drawCircle(canvas, targetX, targetY, radius * if (holding) 0.36f else 0.3f, holding)
-    drawLabel(canvas, if (holding) "C" else "⌫", targetX, targetY + radius * 0.12f, radius * 0.42f, Color.WHITE)
-
-    paint.color = ORANGE
-    paint.style = Paint.Style.STROKE
-    paint.strokeWidth = radius * 0.07f
-    paint.strokeCap = Paint.Cap.ROUND
-    canvas.drawLine(x - radius * 0.35f, y - radius * 0.22f, targetX + radius * 0.28f, targetY + radius * 0.18f, paint)
-    drawFinger(canvas, fingerX, fingerY, radius * 0.24f, if (holding) 1.2f else 1f)
-  }
-
-  private fun drawHistoryScroll(canvas: Canvas, x: Float, y: Float, radius: Float) {
-    val progress = (phase / 0.7f).coerceIn(0f, 1f)
-    val offset = radius * progress
-    paint.style = Paint.Style.STROKE
-    paint.strokeWidth = radius * 0.08f
-    paint.color = Color.rgb(105, 105, 105)
-    repeat(3) { index ->
-      val rowY = y - radius * 0.1f + index * radius * 0.36f - offset
-      canvas.drawLine(x - radius * 0.6f, rowY, x + radius * 0.6f, rowY, paint)
-    }
-    drawFinger(canvas, x, y + radius * 0.55f - offset, radius * 0.22f, 1f)
-  }
-
-  private fun drawCircle(canvas: Canvas, x: Float, y: Float, radius: Float, active: Boolean) {
-    paint.style = Paint.Style.FILL
-    paint.color = if (active) ORANGE else Color.rgb(48, 48, 48)
-    canvas.drawCircle(x, y, radius, paint)
-    paint.style = Paint.Style.STROKE
-    paint.strokeWidth = radius * 0.07f
-    paint.color = if (active) Color.rgb(255, 205, 133) else Color.rgb(105, 105, 105)
-    canvas.drawCircle(x, y, radius, paint)
-  }
-
-  private fun drawFinger(canvas: Canvas, x: Float, y: Float, radius: Float, scale: Float) {
-    paint.style = Paint.Style.FILL
-    paint.color = Color.argb((210 * scale.coerceAtMost(1f)).toInt(), 255, 255, 255)
-    canvas.drawCircle(x, y, radius * scale, paint)
-    paint.style = Paint.Style.STROKE
-    paint.strokeWidth = radius * 0.16f
-    paint.color = Color.argb(170, 0, 0, 0)
-    canvas.drawCircle(x, y, radius * scale, paint)
-  }
-
-  private fun drawLabel(canvas: Canvas, text: String, x: Float, baseline: Float, size: Float, color: Int) {
-    paint.style = Paint.Style.FILL
-    paint.color = color
-    paint.typeface = Typeface.DEFAULT_BOLD
-    paint.textAlign = Paint.Align.CENTER
-    paint.textSize = size
-    canvas.drawText(text, x, baseline, paint)
-  }
-
-  private companion object {
-    const val LOOP_DURATION_MS = 2_000L
-    const val ORANGE = 0xFFDC8F3D.toInt()
   }
 }

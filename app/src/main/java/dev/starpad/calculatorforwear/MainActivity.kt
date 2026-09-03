@@ -156,7 +156,7 @@ class MainActivity : AppCompatActivity() {
       startActivity(Intent(this, SettingsActivity::class.java))
     }
 
-    tutorialController = TutorialController(this, binding.tutorialContainer)
+    tutorialController = TutorialController(this, binding.tutorialContainer, haptics)
     tutorialController.showIfNeeded()
   }
 
@@ -165,16 +165,6 @@ class MainActivity : AppCompatActivity() {
     renderHistory()
     // Settings only stores the replay request and finishes, so the calculator picks it up here.
     if (TutorialReplay.consume(this)) tutorialController.showReplay()
-  }
-
-  override fun onStart() {
-    super.onStart()
-    tutorialController.onStart()
-  }
-
-  override fun onStop() {
-    tutorialController.onStop()
-    super.onStop()
   }
 
   @SuppressLint("SetTextI18n")
@@ -234,7 +224,10 @@ class MainActivity : AppCompatActivity() {
             cancelLongPress()
             resetLongPressButtons()
             if (choice == RadialChoice.BACKSPACE) {
-              backspaceIcon?.postDelayed(armClearAll, longPressDelay)
+              backspaceIcon?.let { icon ->
+                icon.postDelayed(armClearAll, longPressDelay)
+                binding.holdProgress.start(icon, longPressDelay)
+              }
             }
 
             previousChoice?.let { choiceViews[it] }?.let { animateViewSize(it, 1f) }
@@ -341,6 +334,7 @@ class MainActivity : AppCompatActivity() {
   /** Drops a pending clear-all so it cannot arm after the finger moved on or left the screen. */
   private fun cancelLongPress() {
     backspaceIcon?.removeCallbacks(armClearAll)
+    binding.holdProgress.cancel()
   }
 
   /** Names the hovered action on the bezel, where the dragging finger cannot hide it. */

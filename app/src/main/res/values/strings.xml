@@ -1,7 +1,6 @@
 <resources>
     <string name="app_name">Calculator for Wear</string>
     <string name="launcher_name">Calculator</string>
-    <string name="tutorial_page_description">Tutorial page %1$d of %2$d</string>
     <string name="tutorial_tap_number_title">Tap numbers</string>
     <string name="tutorial_tap_number_body">Tap any number around the edge.</string>
     <string name="tutorial_drag_action_title">Choose an action</string>

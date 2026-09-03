@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
   <attr name="MaterialTextButton" format="reference"/>
-  <attr name="TutorialTextButton" format="reference"/>
 
   <!--
     Calculator theme. MainActivity applies the Material You overlay on top of it when the device
@@ -15,7 +14,6 @@
     <item name="android:windowBackground">?attr/colorSurface</item>
     <item name="dynamicColorThemeOverlay">@style/ThemeOverlay.Material3.DynamicColors.Dark</item>
     <item name="MaterialTextButton">@style/Widget.Material3.Button.TextButton</item>
-    <item name="TutorialTextButton">@style/Widget.Tutorial.Button.TextButton</item>
 
     <item name="colorPrimary">@color/md_theme_primary</item>
     <item name="colorOnPrimary">@color/md_theme_on_primary</item>
@@ -51,15 +49,6 @@
     <item name="colorOnSurfaceInverse">@color/md_theme_inverse_on_surface</item>
     <item name="colorOutline">@color/md_theme_outline</item>
     <item name="colorOutlineVariant">@color/md_theme_outline_variant</item>
-  </style>
-
-  <!--
-    The tutorial overlay paints its own black backdrop with fixed white and brand-orange artwork,
-    so its action button keeps the brand color and the Material Components look it has always had,
-    instead of following the Material You palette applied to the calculator.
-  -->
-  <style name="Widget.Tutorial.Button.TextButton" parent="Widget.MaterialComponents.Button.TextButton">
-    <item name="android:textColor">@color/brand_orange</item>
   </style>
 
   <!--
